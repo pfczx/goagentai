@@ -24,10 +24,10 @@ func Repl() error {
 			}
 			err := HandleCommand(commandName,args...)
 			if err!=nil{
-				fmt.Println("Error occured",err)
+				fmt.Println("Error occured: ",err)
 			}
 			if err := sc.Err(); err != nil {
-				fmt.Println("Error reading input:", err)
+				fmt.Println("Error reading input: ", err)
 			}
 		}
 	}
