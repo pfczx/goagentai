@@ -24,12 +24,12 @@ func GetCommands() map[string]CliCommand {
 	Commands := map[string]CliCommand{
 		"exit": {
 			Name:     "exit",
-			Desc:     "exit pokedex",
+			Desc:     "exit repl",
 			Callback: Exit,
 		},
 		"help": {
 			Name:     "help",
-			Desc:     "print desc of cmd",
+			Desc:     "print description of commands",
 			Callback: Help,
 		},
 	}

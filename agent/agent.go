@@ -4,15 +4,19 @@ import (
 	"github.com/pfczx/goagentai/llm"
 )
 
-type Agent struct{
-Provider llm.ModelProvider
-
+type Agent struct {
+	provider    llm.ModelProvider
+	temperature float64
 }
 
-func New(p llm.ModelProvider) *Agent {
-	return &Agent{Provider: p}
+func NewAgent(p llm.ModelProvider, temp float64) *Agent {
+	return &Agent{
+		provider:    p,
+		temperature: temp,
+	}
 }
+
 
 func (a *Agent) Ask(input string) (string, error) {
-	return a.Provider.Generate(input)
+	return a.provider.Generate(input)
 }
