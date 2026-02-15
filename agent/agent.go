@@ -5,18 +5,19 @@ import (
 )
 
 type Agent struct {
-	provider    llm.ModelProvider
-	temperature float64
+	Provider    llm.ModelProvider
+	Temperature float64
+	Config *Config
 }
 
-func NewAgent(p llm.ModelProvider, temp float64) *Agent {
+func NewAgent(p llm.ModelProvider, temp float64, c *Config) *Agent {
 	return &Agent{
-		provider:    p,
-		temperature: temp,
+		Provider:    p,
+		Temperature: temp,
+		Config: c,
 	}
 }
 
-
 func (a *Agent) Ask(input string) (string, error) {
-	return a.provider.Generate(input)
+	return a.Provider.Generate(input)
 }

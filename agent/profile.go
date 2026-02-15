@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -13,40 +11,57 @@ type Profile struct {
 	Config Config
 }
 
-func NewProfile(name string, path string, config Config) *Profile {
+func NewProfile(name string, path string, config *Config) *Profile {
 	return &Profile{
 		Name:   name,
 		Path:   path,
-		Config: config,
+		Config: *config,
 	}
 }
 
+func InitProfile(args ...string) error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(homeDir, ".config", "goagent", "profiles", args[0])
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if err := os.MkdirAll(path, 0755); err != nil {
+			return err
+		}
+	}
+	configPath := filepath.Join(path, "config.json")
+
+	if _, err = os.Stat(configPath);os.IsNotExist(err) {
+		if err := SaveConfig(configPath,DefaultConfig());err!=nil{
+			return err
+		}
+	}
+	return nil
+}
+/*
 func InitDefaultProfile() error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
 	pathToDefault := filepath.Join(homeDir, ".config", "goagent", "profiles", "default")
-	if _, err := os.Stat(pathToDefault); err != nil {
-		return fmt.Errorf("Default directory already exists in " + pathToDefault)
-	} else {
-		if err = os.MkdirAll(pathToDefault, 0755); err != nil {
-			return err
-		}
-		configPath := filepath.Join(pathToDefault, "config.json")
-		defaultConfig := DefaultConfig()
-		if _, err = os.Stat(configPath); err != nil {
-			return err
-		}
-		data, err := json.Marshal(defaultConfig)
-		if err != nil {
-			return err
-		}
-		if err = os.WriteFile(configPath, []byte(data), 0644); err != nil {
-			return err
-		}
 
+	if _, err := os.Stat(pathToDefault); os.IsNotExist(err) {
+		if err := os.MkdirAll(pathToDefault, 0755); err != nil {
+			return err
+		}
+	}
+
+	configPath := filepath.Join(pathToDefault, "config.json")
+
+	if _, err = os.Stat(configPath); err != nil {
+		return err
+	}
+	if err = SaveConfig(configPath, DefaultConfig()); err != nil {
+		return err
 	}
 
 	return nil
 }
+*/

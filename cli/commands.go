@@ -1,6 +1,9 @@
 package cli
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/pfczx/goagentai/agent"
+)
 
 type CliCommand struct {
 	Name     string
@@ -21,7 +24,7 @@ func HandleCommand(commandName string, args ...string) error {
 }
 
 func GetCommands() map[string]CliCommand {
-	Commands := map[string]CliCommand{
+	commands := map[string]CliCommand{
 		"exit": {
 			Name:     "exit",
 			Desc:     "exit repl",
@@ -32,6 +35,11 @@ func GetCommands() map[string]CliCommand {
 			Desc:     "print description of commands",
 			Callback: Help,
 		},
+		"init": {
+			Name:     "init",
+			Desc:     "Creating profile with name provided in first argument and default config in .config/goagent",
+			Callback: agent.InitProfile,
+		},
 	}
-	return Commands
+	return commands
 }
