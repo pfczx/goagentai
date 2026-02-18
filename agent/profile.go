@@ -3,19 +3,25 @@ package agent
 import (
 	"os"
 	"path/filepath"
+
+	"github.com/pfczx/goagentai/llm"
 )
 
 type Profile struct {
 	Name   string
 	Path   string
-	Config Config
+	Config *Config
+	Provider llm.ModelProvider
+	Temperature float64
 }
 
-func NewProfile(name string, path string, config *Config) *Profile {
+func NewProfile(name string, path string, config *Config, provider llm.ModelProvider,temperature float64 ) *Profile {
 	return &Profile{
 		Name:   name,
 		Path:   path,
-		Config: *config,
+		Config: config,
+    Provider: provider,
+		Temperature: temperature,
 	}
 }
 
@@ -33,7 +39,7 @@ func InitProfile(args ...string) error {
 	configPath := filepath.Join(path, "config.json")
 
 	if _, err = os.Stat(configPath);os.IsNotExist(err) {
-		if err := SaveConfig(configPath,DefaultConfig());err!=nil{
+		if err := SaveConfig(configPath,DefaultConfig(args[0]));err!=nil{
 			return err
 		}
 	}
