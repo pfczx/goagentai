@@ -8,21 +8,31 @@ import (
 )
 
 type Profile struct {
-	Name   string
-	Path   string
-	Config *Config
-	Provider llm.ModelProvider
+	Name        string
+	Path        string
+	Config      *Config
+	Provider    llm.ModelProvider
 	Temperature float64
 }
 
-func NewProfile(name string, path string, config *Config, provider llm.ModelProvider,temperature float64 ) *Profile {
+func NewProfile(name string, path string, config *Config, provider llm.ModelProvider, temperature float64) *Profile {
 	return &Profile{
-		Name:   name,
-		Path:   path,
-		Config: config,
-    Provider: provider,
+		Name:        name,
+		Path:        path,
+		Config:      config,
+		Provider:    provider,
 		Temperature: temperature,
 	}
+}
+
+func (c *Config) ProfileFromConfig() (*Profile, error) {
+	provider, err := llm.NewProvider(c.Provider, c.Model)
+	if err != nil {
+		return nil, err
+	}
+	return NewProfile(
+		c.Name, c.Path, c, provider, c.Temperature,
+	), nil
 }
 
 func InitProfile(args ...string) error {
@@ -38,13 +48,14 @@ func InitProfile(args ...string) error {
 	}
 	configPath := filepath.Join(path, "config.json")
 
-	if _, err = os.Stat(configPath);os.IsNotExist(err) {
-		if err := SaveConfig(configPath,DefaultConfig(args[0]));err!=nil{
+	if _, err = os.Stat(configPath); os.IsNotExist(err) {
+		if err := SaveConfig(configPath, DefaultConfig(args[0], path)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
+
 /*
 func InitDefaultProfile() error {
 	homeDir, err := os.UserHomeDir()
