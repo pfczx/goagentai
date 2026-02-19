@@ -26,7 +26,7 @@ func NewProfile(name string, path string, config *Config, provider llm.ModelProv
 }
 
 func (c *Config) ProfileFromConfig() (*Profile, error) {
-	provider, err := llm.NewProvider(c.Provider, c.Model)
+	provider, err := llm.NewProvider(c.Name,c.Model,c.IternalProvider)
 	if err != nil {
 		return nil, err
 	}

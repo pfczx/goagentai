@@ -6,18 +6,22 @@ import (
 )
 
 type Config struct {
-	Name        string  `json:"name"`
-	Provider    string  `json:"provider"`
-	Model       string  `json:"model"`
-	Temperature float64 `json:"temperature"`
+	Name            string  `json:"name"`
+	Path            string  `json:"path"`
+	Provider        string  `json:"provider"`
+	IternalProvider string  `json:"iternalprovider"`
+	Model           string  `json:"model"`
+	Temperature     float64 `json:"temperature"`
 }
 
-func DefaultConfig(name string) *Config {
+func DefaultConfig(name string, path string) *Config {
 	return &Config{
-		Name:        name,
-		Provider:    "HuggingFace",
-		Model:       "Model",
-		Temperature: 50.0,
+		Name:            name,
+		Path:            path,
+		Provider:        "HuggingFace",
+		IternalProvider: "fireworks-ai",
+		Model:           "moonshot/Kimi-K2.5",
+		Temperature:     50.0,
 	}
 }
 
