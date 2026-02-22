@@ -6,8 +6,8 @@ import (
 
 // input for model include text and photo
 type ChatMessage struct {
-	Role    string        `json:"role"`
-	Content []ContentPart `json:"content"`
+	SystenPrompt string        `json:"system_prompt"`
+	Content      []ContentPart `json:"content"`
 }
 
 type ContentPart struct {

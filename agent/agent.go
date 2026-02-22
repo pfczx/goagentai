@@ -14,5 +14,6 @@ func NewAgent(profile *Profile) *Agent {
 }
 
 func (a *Agent) Ask(input string) (string, error) {
-	return a.profile.Provider.Generate(input)
+return  "",nil
+	
 }
