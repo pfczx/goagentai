@@ -6,7 +6,7 @@ import (
 
 // input for model include text and photo
 type ChatMessage struct {
-	SystenPrompt string        `json:"system_prompt"`
+	SystemPrompt string        `json:"system_prompt"`
 	Content      []ContentPart `json:"content"`
 }
 
