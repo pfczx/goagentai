@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
-	"io"
 )
 
 type HuggingFace struct {
@@ -32,11 +32,11 @@ func (h *HuggingFace) Name() string {
 	return "HuggingFace"
 }
 
-func (h *HuggingFace) IternalProviderName() string{
+func (h *HuggingFace) IternalProviderName() string {
 	return h.InternalProvider
 }
 
-func (h* HuggingFace) ModelName() string{
+func (h *HuggingFace) ModelName() string {
 	return h.Model
 }
 func (h *HuggingFace) SwitchModel(model string) error {
@@ -49,11 +49,10 @@ func (h *HuggingFace) SwitchIternalProvider(provider string) error {
 	return nil
 }
 
-
 func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 	endpoint := "https://router.huggingface.co/v1/chat/completions"
 
-	//building reques from ChatMessage struct 
+	//building reques from ChatMessage struct
 	var contentParts []map[string]interface{}
 
 	for _, part := range message.Content {
