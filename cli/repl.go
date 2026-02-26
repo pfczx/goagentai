@@ -5,9 +5,11 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/pfczx/goagentai/agent"
 )
 
-func Repl() error {
+func Repl(agent *agent.Agent) error {
 	sc := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Printf("\033[32m" + "GoAgent > " + "\033[0m")
@@ -22,7 +24,7 @@ func Repl() error {
 			if len(parts) > 1 {
 				args = parts[1:]
 			}
-			err := HandleCommand(commandName, args...)
+			err := HandleCommand(agent, commandName, args...)
 			if err != nil {
 				fmt.Println("Error occured: ", err)
 			}

@@ -6,12 +6,12 @@ import (
 )
 
 type Agent struct {
-	profile *Profile
+	Profile *Profile
 }
 
 func NewAgent(profile *Profile) *Agent {
 	return &Agent{
-		profile: profile,
+		Profile: profile,
 	}
 }
 
@@ -20,7 +20,7 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 	if err != nil {
 		return nil, err
 	}
-	llmResponse, err := a.profile.Provider.Generate(message)
+	llmResponse, err := a.Profile.Provider.Generate(message)
 	if err != nil {
 		return nil, err
 	}

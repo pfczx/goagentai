@@ -8,13 +8,13 @@ import (
 type CliCommand struct {
 	Name     string
 	Desc     string
-	Callback func(...string) error
+	Callback func(agent *agent.Agent, args ...string) error
 }
 
-func HandleCommand(commandName string, args ...string) error {
+func HandleCommand(agent *agent.Agent, commandName string, args ...string) error {
 	commands := GetCommands()
 	if cmd, exists := commands[commandName]; exists {
-		if err := cmd.Callback(args...); err != nil {
+		if err := cmd.Callback(agent, args...); err != nil {
 			return err
 		}
 	} else {
@@ -26,19 +26,25 @@ func HandleCommand(commandName string, args ...string) error {
 func GetCommands() map[string]CliCommand {
 	commands := map[string]CliCommand{
 		"exit": {
-			Name:     "exit",
-			Desc:     "exit repl",
-			Callback: Exit,
+			Name: "exit",
+			Desc: "exit repl",
+			Callback: func(_ *agent.Agent, _ ...string) error {
+				return Exit()
+			},
 		},
 		"help": {
-			Name:     "help",
-			Desc:     "print description of commands",
-			Callback: Help,
+			Name: "help",
+			Desc: "print description of commands",
+			Callback: func(_ *agent.Agent, _ ...string) error {
+				return Help()
+			},
 		},
 		"init": {
-			Name:     "init",
-			Desc:     "Creating profile with name provided in first argument and default config in .config/goagent",
-			Callback: agent.InitProfile,
+			Name: "init",
+			Desc: "Creating profile with name provided in first argument and default config in .config/goagent",
+			Callback: func(_ *agent.Agent, args ...string) error {
+				return agent.InitProfile(args...)
+			},
 		},
 	}
 	return commands

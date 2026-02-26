@@ -25,14 +25,58 @@ func NewProfile(name string, path string, config *Config, provider llm.ModelProv
 	}
 }
 
+func LoadLatestUsedProfileName() (string, error) {
+	path, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	path = filepath.Join(path, ".config", "goagent", "latestProfile")
+	name, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+	return string(name), nil
+
+}
+
+func (p *Profile) SaveLatestUsedProfileName() error {
+	path, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	path = filepath.Join(path, ".config", "goagent", "latestProfile")
+	err = os.WriteFile(path, []byte(p.Name), 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Config) ProfileFromConfig() (*Profile, error) {
-	provider, err := llm.NewProvider(c.Name,c.Model,c.IternalProvider)
+	provider, err := llm.NewProvider(c.Name, c.Model, c.IternalProvider)
 	if err != nil {
 		return nil, err
 	}
 	return NewProfile(
 		c.Name, c.Path, c, provider, c.Temperature,
 	), nil
+}
+
+func (p *Profile) UpdateConfigFromProfile() error {
+	config := &Config{
+		Path:            p.Path,
+		Name:            p.Name,
+		Provider:        p.Provider.Name(),
+		IternalProvider: p.Provider.IternalProviderName(),
+		Model:           p.Provider.ModelName(),
+		Temperature:     p.Temperature,
+	}
+
+	err := SaveConfig(p.Path, config)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func InitProfile(args ...string) error {
@@ -56,29 +100,38 @@ func InitProfile(args ...string) error {
 	return nil
 }
 
-/*
-func InitDefaultProfile() error {
-	homeDir, err := os.UserHomeDir()
+func FirstInitialize() error {
+	err := InitProfile("default")
 	if err != nil {
 		return err
 	}
-	pathToDefault := filepath.Join(homeDir, ".config", "goagent", "profiles", "default")
 
-	if _, err := os.Stat(pathToDefault); os.IsNotExist(err) {
-		if err := os.MkdirAll(pathToDefault, 0755); err != nil {
+	path, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	envPath := filepath.Join(path, ".config", "goagent", ".env")
+	if _, err := os.Stat(envPath); os.IsNotExist(err) {
+		content := `
+HUGGING_FACE=
+
+GROK=
+
+OPENROUTER=
+`
+		err = os.WriteFile(envPath, []byte(content), 0644)
+		if err != nil {
 			return err
 		}
 	}
 
-	configPath := filepath.Join(pathToDefault, "config.json")
-
-	if _, err = os.Stat(configPath); err != nil {
-		return err
-	}
-	if err = SaveConfig(configPath, DefaultConfig()); err != nil {
-		return err
+	latestProfilePath := filepath.Join(path, ".config", "goagent", "latestProfile")
+	if _, err := os.Stat(latestProfilePath); os.IsNotExist(err) {
+		err = os.WriteFile(latestProfilePath, []byte("default"), 0644)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
-*/

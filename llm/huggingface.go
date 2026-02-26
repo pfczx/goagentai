@@ -28,6 +28,17 @@ func NewHuggingFace(model string, iternalProvider string) (*HuggingFace, error) 
 	}, nil
 }
 
+func (h *HuggingFace) Name() string {
+	return "HuggingFace"
+}
+
+func (h *HuggingFace) IternalProviderName() string{
+	return h.InternalProvider
+}
+
+func (h* HuggingFace) ModelName() string{
+	return h.Model
+}
 func (h *HuggingFace) SwitchModel(model string) error {
 	h.Model = model
 	return nil
@@ -37,9 +48,7 @@ func (h *HuggingFace) SwitchIternalProvider(provider string) error {
 	h.InternalProvider = provider
 	return nil
 }
-func (h *HuggingFace) Name() string {
-	return "Provider: HuggingFace"
-}
+
 
 func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 	endpoint := "https://router.huggingface.co/v1/chat/completions"
@@ -66,10 +75,10 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 
 	var messages []map[string]interface{}
 
-	if message.SystenPrompt != "" {
+	if message.SystemPrompt != "" {
 		messages = append(messages, map[string]interface{}{
 			"role":    "system",
-			"content": message.SystenPrompt,
+			"content": message.SystemPrompt,
 		})
 	}
 

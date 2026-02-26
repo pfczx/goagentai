@@ -31,6 +31,8 @@ type Usage struct {
 type ModelProvider interface {
 	Generate(message ChatMessage) (*ChatResponse, error)
 	Name() string
+	ModelName() string
+	IternalProviderName() string
 	SwitchModel(model string) error
 	SwitchIternalProvider(provider string) error
 }
