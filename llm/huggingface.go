@@ -18,7 +18,7 @@ type HuggingFace struct {
 func NewHuggingFace(model string, iternalProvider string) (*HuggingFace, error) {
 	key := os.Getenv("HUGGING_FACE")
 	if key == "" {
-		return nil, fmt.Errorf("There is no value for %s in .env file", key)
+		return nil, fmt.Errorf("There is no value for %s in .env file, add your key to .env file in .config/goagent", key)
 	}
 
 	return &HuggingFace{

@@ -10,7 +10,7 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	path = filepath.Join(path, ".config", "goagent", profileName, "config.json")
+	path = filepath.Join(path, ".config", "goagent","profiles", profileName, "config.json")
 	config, err := LoadConfig(path)
 	if err != nil {
 		return nil, err

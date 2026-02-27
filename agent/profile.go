@@ -53,7 +53,7 @@ func (p *Profile) SaveLatestUsedProfileName() error {
 }
 
 func (c *Config) ProfileFromConfig() (*Profile, error) {
-	provider, err := llm.NewProvider(c.Name, c.Model, c.IternalProvider)
+	provider, err := llm.NewProvider(c.Provider, c.Model, c.IternalProvider)
 	if err != nil {
 		return nil, err
 	}

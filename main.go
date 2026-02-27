@@ -2,20 +2,22 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"github.com/pfczx/goagentai/agent"
 	"github.com/pfczx/goagentai/cli"
-	"os"
 )
 
 func main() {
 	profileName, err := agent.LoadLatestUsedProfileName()
 	if os.IsNotExist(err) {
 		fmt.Println("No profile found. Running first initialization.")
+		profileName = "default"
 		agent.FirstInitialize()
 	} else if err != nil {
 		fmt.Println("Error loading latest profile: ", err)
 		os.Exit(1)
 	}
+	cli.LoadEnv()
 	agent, err := agent.InitAgent(profileName)
 	if err != nil {
 		fmt.Println("Error occured durning agent initialization: ", err)
