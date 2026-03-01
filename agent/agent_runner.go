@@ -1,8 +1,12 @@
 package agent
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/charmbracelet/glamour"
 )
 
 func InitAgent(profileName string) (*Agent, error) {
@@ -10,7 +14,7 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	path = filepath.Join(path, ".config", "goagent","profiles", profileName, "config.json")
+	path = filepath.Join(path, ".config", "goagent", "profiles", profileName, "config.json")
 	config, err := LoadConfig(path)
 	if err != nil {
 		return nil, err
@@ -23,4 +27,16 @@ func InitAgent(profileName string) (*Agent, error) {
 	return NewAgent(profile), nil
 }
 
+func RunAsk(agent *Agent, args ...string) error {
+	resp, err := agent.Ask(strings.Join(args," "))
+	if err != nil {
+		return err
+	}
+	out, err := glamour.Render(resp.Text, "auto")
+	if err != nil {
+		return err
+	}
+	fmt.Print(out)
+	return nil
 
+}
