@@ -46,11 +46,10 @@ func GetCommands() map[string]CliCommand {
 				return agent.InitProfile(args...)
 			},
 		},
-		"ask":{
-			Name: "ask",
-			Desc: "Ask llm question provided in first argument",
+		"ask": {
+			Name:     "ask",
+			Desc:     "Ask llm question provided in first argument",
 			Callback: agent.RunAsk,
-
 		},
 	}
 	return commands

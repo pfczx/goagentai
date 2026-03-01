@@ -28,7 +28,7 @@ func InitAgent(profileName string) (*Agent, error) {
 }
 
 func RunAsk(agent *Agent, args ...string) error {
-	resp, err := agent.Ask(strings.Join(args," "))
+	resp, err := agent.Ask(strings.Join(args, " "))
 	if err != nil {
 		return err
 	}
