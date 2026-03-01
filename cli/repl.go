@@ -12,7 +12,11 @@ import (
 func Repl(agent *agent.Agent) error {
 	sc := bufio.NewScanner(os.Stdin)
 	for {
-		fmt.Printf("\033[32m" + "GoAgent > " + "\033[0m")
+		PrintState(agent.Profile.Name,
+			agent.Profile.Config.Provider,
+			agent.Profile.Config.IternalProvider,
+			agent.Profile.Config.Model,
+		)
 		if sc.Scan() {
 			text := strings.TrimSpace(sc.Text())
 			parts := strings.Fields(text)

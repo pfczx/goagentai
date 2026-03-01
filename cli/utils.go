@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	"os"
 	"path/filepath"
@@ -35,4 +36,16 @@ func LoadEnv() error {
 	}
 
 	return nil
+}
+
+func PrintState(profileName string, provider string, iternalProvider string, model string) {
+	agent := color.New(color.FgCyan).Sprint("GoAgent")
+	profile := color.New(color.FgCyan).Sprint(profileName)
+	provider = color.New(color.FgGreen).Sprint(provider)
+	iternalProvider = color.New(color.FgYellow).Sprint(iternalProvider)
+	model = color.New(color.FgBlue).Sprint(model)
+	prompt := fmt.Sprint("$")
+
+	fmt.Printf("%s@%s (%s::%s::%s) \n", agent, profile, provider, iternalProvider, model)
+	fmt.Printf("%s ", prompt)
 }
