@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/charmbracelet/glamour"
+	"github.com/pfczx/goagentai/llm"
 )
 
 func InitAgent(profileName string) (*Agent, error) {
@@ -39,4 +40,44 @@ func RunAsk(agent *Agent, args ...string) error {
 	fmt.Print(out)
 	return nil
 
+}
+
+func Switch(agent *Agent, args ...string) error {
+	switch args[0] {
+	case "profile":
+		path, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		path = filepath.Join(path, ".config", "goagent", "profiles", args[1])
+		conf, err := LoadConfig(path)
+		if err != nil {
+			return err
+		}
+		profile, err := conf.ProfileFromConfig()
+		if err != nil {
+			return err
+		}
+		agent.Profile = profile
+	case "provider":
+		provider, err := llm.NewProvider(args[1],
+			agent.Profile.Provider.ModelName(),
+			agent.Profile.Provider.IternalProviderName())
+		if err != nil {
+			return err
+		}
+		agent.Profile.Provider = provider
+	case "iternal-provider":
+		agent.Profile.Provider.SwitchIternalProvider(args[1])
+	case "model":
+		agent.Profile.Provider.SwitchModel(args[1])
+	default:
+		return fmt.Errorf("First argument is not valid")
+	}
+	err := agent.Profile.UpdateConfigFromProfile()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -51,6 +51,11 @@ func GetCommands() map[string]CliCommand {
 			Desc:     "Ask llm question provided in first argument",
 			Callback: agent.RunAsk,
 		},
+		"switch": {
+			Name:     "switch",
+			Desc:     "Switching setting provided in first argument, switch [thing to swith] [name of new thing], first arguments: profile,iternal-provider,provider,model",
+			Callback: agent.Switch,
+		},
 	}
 	return commands
 }

@@ -71,8 +71,8 @@ func (p *Profile) UpdateConfigFromProfile() error {
 		Model:           p.Provider.ModelName(),
 		Temperature:     p.Temperature,
 	}
-
-	err := SaveConfig(p.Path, config)
+	p.Config = config
+	err := SaveConfig(filepath.Join(p.Path, "config.json"), config)
 	if err != nil {
 		return err
 	}
