@@ -2,10 +2,13 @@ package cli
 
 import (
 	"fmt"
-	"github.com/fatih/color"
-	"github.com/joho/godotenv"
 	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/charmbracelet/glamour"
+	"github.com/fatih/color"
+	"github.com/joho/godotenv"
 )
 
 func Exit() error {
@@ -16,9 +19,24 @@ func Exit() error {
 
 func Help() error {
 	commands := GetCommands()
+	var builder strings.Builder
+
+	builder.WriteString("# GoAgent Help\n\n")
+
+	builder.WriteString("## Available Commands\n\n")
+
 	for _, cmd := range commands {
-		fmt.Printf("Command: %s   Desc: %s\n", cmd.Name, cmd.Desc)
+		builder.WriteString(fmt.Sprintf("### `%s`\n\n", cmd.Name))
+		builder.WriteString(cmd.Desc)
+		builder.WriteString("\n\n")
 	}
+
+	out, err := glamour.Render(builder.String(), "auto")
+	if err != nil {
+		return err
+	}
+
+	fmt.Print(out)
 	return nil
 }
 
