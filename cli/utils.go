@@ -67,3 +67,5 @@ func PrintState(profileName string, provider string, iternalProvider string, mod
 	fmt.Printf("%s@%s (%s::%s::%s) \n", agent, profile, provider, iternalProvider, model)
 	fmt.Printf("%s ", prompt)
 }
+
+

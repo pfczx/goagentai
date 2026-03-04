@@ -26,7 +26,7 @@ func DefaultConfig(name string, path string) *Config {
 }
 
 func SaveConfig(path string, config *Config) error {
-	data, err := json.Marshal(config)
+	data, err := json.MarshalIndent(config,""," ")
 	if err != nil {
 		return err
 	}

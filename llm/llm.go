@@ -35,6 +35,8 @@ type ModelProvider interface {
 	IternalProviderName() string
 	SwitchModel(model string) error
 	SwitchIternalProvider(provider string) error
+	ListIternalProviders() ([]string, error)
+	ListProviderModels(provider string, withPhoto bool) ([]string, error)
 }
 
 func NewProvider(name string, model string, iternalProvider string) (ModelProvider, error) {
@@ -44,4 +46,13 @@ func NewProvider(name string, model string, iternalProvider string) (ModelProvid
 	default:
 		return nil, fmt.Errorf("unknown provider %s", name)
 	}
+}
+
+func ListProviders() []string {
+	//currently avaible providers
+	providers := []string{
+		"HuggingFace",
+		"Groq",
+	}
+	return providers
 }

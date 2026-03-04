@@ -56,6 +56,16 @@ func GetCommands() map[string]CliCommand {
 			Desc:     "Switching setting provided in first argument, switch [thing to swith] [name of new thing], first arguments: profile,iternal-provider,provider,model",
 			Callback: agent.Switch,
 		},
+		"list": {
+			Name:     "list",
+			Desc:     "Print list of selected things, list [thing to list],first arguments: providers,itenral-providers,models ,--image flag for listing models accepting photo input",
+			Callback: agent.List,
+		},
+		"config": {
+			Name:     "config",
+			Desc:     "Open config for current profile in default editor and load it after",
+			Callback: agent.EditConfig,
+		},
 	}
 	return commands
 }

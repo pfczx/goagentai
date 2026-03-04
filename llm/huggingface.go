@@ -152,9 +152,61 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 			usage.TotalTokens = int(v)
 		}
 	}
-
 	return &ChatResponse{
 		Text:  responseText,
 		Usage: usage,
 	}, nil
+}
+
+func (h *HuggingFace) ListIternalProviders() ([]string, error) {
+	//there is no api endpoint for iternal providers
+	//manual created list of providers with llm models
+	list := []string{
+		"cerebras",
+		"cohere",
+		"featherless-ai",
+		"fireworks-ai",
+		"groq",
+		"hyperbolic",
+		"novita",
+		"nscale",
+		"ovhcloud",
+		"publicai",
+		"sambanova",
+		"scaleway",
+		"together",
+		"zai-org",
+	}
+	return list, nil
+}
+
+func (h *HuggingFace) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
+	url := "https://huggingface.co/api/models?inference_provider=" + provider
+	if withPhoto {
+		url = url + "&pipeline_tag=image-text-to-text"
+	} else {
+		url = url + "&pipeline_tag=text-generation"
+	}
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	type model struct {
+		Id string `json:"id"`
+	}
+	var models []model
+
+	err = json.NewDecoder(resp.Body).Decode(&models)
+	if err != nil {
+		return nil, err
+	}
+	var modelsList []string
+	for _, model := range models {
+		modelsList = append(modelsList, model.Id)
+	}
+
+	return modelsList, nil
+
 }

@@ -3,6 +3,7 @@ package agent
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -84,4 +85,102 @@ func Switch(agent *Agent, args ...string) error {
 	}
 
 	return nil
+}
+
+func List(agent *Agent, args ...string) error {
+	var builder strings.Builder
+	switch args[0] {
+	case "providers":
+		list := llm.ListProviders()
+		builder.WriteString("# Currently availble providers\n\n")
+		for _, provider := range list {
+			builder.WriteString("## ")
+			builder.WriteString(provider + "\n")
+		}
+		out, err := glamour.Render(builder.String(), "auto")
+		if err != nil {
+			return err
+		}
+
+		fmt.Print(out)
+
+	case "iternal-providers":
+		list, err := agent.Profile.Provider.ListIternalProviders()
+		if err != nil {
+			return err
+		}
+		builder.WriteString("# Currently availble iternal-providers for ")
+		builder.WriteString(agent.Profile.Provider.Name() + "\n\n")
+		for _, iternalProvider := range list {
+			builder.WriteString("## ")
+			builder.WriteString(iternalProvider + "\n")
+		}
+		out, err := glamour.Render(builder.String(), "auto")
+		if err != nil {
+			return err
+		}
+
+		fmt.Print(out)
+	case "models":
+		withPhoto := false
+		if len(args) > 1 && args[1] == "--image" {
+			withPhoto = true
+		}
+		list, err := agent.Profile.Provider.ListProviderModels(agent.Profile.Provider.IternalProviderName(), withPhoto)
+		if err != nil {
+			return err
+		}
+		builder.WriteString("# Currently availble models for ")
+		builder.WriteString(agent.Profile.Provider.IternalProviderName() + "\n\n")
+		for _, model := range list {
+			builder.WriteString("## ")
+			builder.WriteString(model + "\n")
+		}
+		out, err := glamour.Render(builder.String(), "auto")
+		if err != nil {
+			return err
+		}
+
+		fmt.Print(out)
+
+	default:
+		return fmt.Errorf("First argument is not valid")
+
+	}
+	return nil
+}
+
+func EditConfig(agent *Agent, args ...string) error {
+	configPath := filepath.Join(agent.Profile.Path, "config.json")
+	editor := os.Getenv("EDITOR")
+	if editor == "" {
+		editor = "nano"
+	}
+
+	cmd := exec.Command(editor, configPath)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	if err := cmd.Run(); err != nil {
+		return err
+	}
+	newAgent, err := InitAgent(agent.Profile.Name)
+	if err != nil {
+		return err
+	}
+	*agent = *newAgent
+	return nil
+
+}
+
+func Check(agnet *Agent, args ...string) error {
+	switch args[0] {
+	case "model":
+	default:
+		fmt.Errorf("First argument is not valid")
+
+	}
+	return nil
+
 }
