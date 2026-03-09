@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/pfczx/goagentai/llm"
+	"github.com/pfczx/goagentai/memory"
 )
 
 type Profile struct {
@@ -96,6 +97,10 @@ func InitProfile(args ...string) error {
 		if err := SaveConfig(configPath, DefaultConfig(args[0], path)); err != nil {
 			return err
 		}
+	}
+	err = memory.InitShortMemoryFile(path)
+	if err != nil {
+		return err
 	}
 	return nil
 }

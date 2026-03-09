@@ -59,7 +59,7 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 		switch part.Type {
 		case "text":
 			contentParts = append(contentParts, map[string]interface{}{
-				"type": "text",
+				"type": part.Type,
 				"text": part.Text,
 			})
 		case "image_url":

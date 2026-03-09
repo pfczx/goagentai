@@ -17,7 +17,10 @@ func main() {
 		fmt.Println("Error loading latest profile: ", err)
 		os.Exit(1)
 	}
-	cli.LoadEnv()
+	err = cli.LoadEnv()
+	if err != nil {
+		fmt.Println("Error occured when loading env file: ", err)
+	}
 	agent, err := agent.InitAgent(profileName)
 	if err != nil {
 		fmt.Println("Error occured durning agent initialization: ", err)

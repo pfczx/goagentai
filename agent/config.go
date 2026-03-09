@@ -6,27 +6,33 @@ import (
 )
 
 type Config struct {
-	Name            string  `json:"name"`
-	Path            string  `json:"path"`
-	Provider        string  `json:"provider"`
-	IternalProvider string  `json:"iternalprovider"`
-	Model           string  `json:"model"`
-	Temperature     float64 `json:"temperature"`
+	Name                      string  `json:"name"`
+	Path                      string  `json:"path"`
+	Provider                  string  `json:"provider"`
+	IternalProvider           string  `json:"iternalprovider"`
+	Model                     string  `json:"model"`
+	Temperature               float64 `json:"temperature"`
+	MemoryOn                  bool    `json:"memory_on"`
+	ShortTermMemoryLimit      int     `json:"short_term_memory_limit"`
+	ShortTermMemoryEvaluation bool    `json:"short_term_memory_evaluation_on"`
 }
 
 func DefaultConfig(name string, path string) *Config {
 	return &Config{
-		Name:            name,
-		Path:            path,
-		Provider:        "HuggingFace",
-		IternalProvider: "fireworks-ai",
-		Model:           "moonshot/Kimi-K2.5",
-		Temperature:     50.0,
+		Name:                      name,
+		Path:                      path,
+		Provider:                  "HuggingFace",
+		IternalProvider:           "fireworks-ai",
+		Model:                     "moonshot/Kimi-K2.5",
+		Temperature:               50.0,
+		MemoryOn:                  true,
+		ShortTermMemoryLimit:      20,
+		ShortTermMemoryEvaluation: true,
 	}
 }
 
 func SaveConfig(path string, config *Config) error {
-	data, err := json.MarshalIndent(config,""," ")
+	data, err := json.MarshalIndent(config, "", " ")
 	if err != nil {
 		return err
 	}

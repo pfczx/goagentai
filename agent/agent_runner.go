@@ -39,6 +39,8 @@ func RunAsk(agent *Agent, args ...string) error {
 		return err
 	}
 	fmt.Print(out)
+	fmt.Printf("Tokens prompt: %v completion: %v total: %v \n", resp.Usage.PromptTokens, resp.Usage.CompletionTokens, resp.Usage.TotalTokens)
+
 	return nil
 
 }
@@ -170,17 +172,6 @@ func EditConfig(agent *Agent, args ...string) error {
 		return err
 	}
 	*agent = *newAgent
-	return nil
-
-}
-
-func Check(agnet *Agent, args ...string) error {
-	switch args[0] {
-	case "model":
-	default:
-		fmt.Errorf("First argument is not valid")
-
-	}
 	return nil
 
 }
