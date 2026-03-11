@@ -11,7 +11,10 @@ type MemoryMenager struct {
 
 func InitMenager(path string) (*MemoryMenager, error) {
 	return &MemoryMenager{
-		MemoryOn: ,
-	}
+		MemoryOn: true,
+		ShortTermMemoryLimit: 20,
+		ShortTermMemoryEvaluation: true,
+		ShortMemory: ShortTermMemory{},
+	},nil
 
 }

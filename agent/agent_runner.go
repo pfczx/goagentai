@@ -9,6 +9,7 @@ import (
 
 	"github.com/charmbracelet/glamour"
 	"github.com/pfczx/goagentai/llm"
+	"github.com/pfczx/goagentai/memory"
 )
 
 func InitAgent(profileName string) (*Agent, error) {
@@ -25,8 +26,8 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
+	return NewAgent(profile, &memory.MemoryMenager{}), nil
 
-	return NewAgent(profile), nil
 }
 
 func RunAsk(agent *Agent, args ...string) error {
@@ -39,8 +40,16 @@ func RunAsk(agent *Agent, args ...string) error {
 		return err
 	}
 	fmt.Print(out)
-	fmt.Printf("Tokens prompt: %v completion: %v total: %v \n", resp.Usage.PromptTokens, resp.Usage.CompletionTokens, resp.Usage.TotalTokens)
+	if resp.Usage != nil {
+		fmt.Printf("Tokens prompt: %v completion: %v total: %v \n",
+			resp.Usage.PromptTokens,
+			resp.Usage.CompletionTokens,
+			resp.Usage.TotalTokens)
+	} else {
+		fmt.Println("(No token usage data available)")
+	}
 
+	return nil
 	return nil
 
 }
