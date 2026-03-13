@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type HuggingFace struct {
@@ -17,15 +18,16 @@ type HuggingFace struct {
 
 func NewHuggingFace(model string, iternalProvider string) (*HuggingFace, error) {
 	key := os.Getenv("HUGGING_FACE")
-	if key == "" {
-		return nil, fmt.Errorf("There is no value for %s in .env file, add your key to .env file in .config/goagent", key)
-	}
-
-	return &HuggingFace{
+	provider := &HuggingFace{
 		ApiKey:           key,
 		InternalProvider: iternalProvider,
 		Model:            model,
-	}, nil
+	}
+	if key == "" {
+		fmt.Println("There is no key in .env file (HuggingFace), add your key to .env file in .config/goagent and restart or switch provider")
+		return provider, nil
+	}
+	return provider, nil
 }
 
 func (h *HuggingFace) Name() string {
@@ -151,6 +153,10 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 		if v, ok := u["total_tokens"].(float64); ok {
 			usage.TotalTokens = int(v)
 		}
+	}
+
+	if strings.Contains(responseText, "error") {
+		fmt.Println(string(respBody))
 	}
 	return &ChatResponse{
 		Text:  responseText,

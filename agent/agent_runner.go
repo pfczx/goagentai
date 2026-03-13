@@ -50,8 +50,6 @@ func RunAsk(agent *Agent, args ...string) error {
 	}
 
 	return nil
-	return nil
-
 }
 
 func Switch(agent *Agent, args ...string) error {

@@ -18,7 +18,7 @@ type ShortTermPart struct {
 
 func InitShortMemoryFile(path string) error {
 	path = filepath.Join(path, "shortTermMemory.json")
-	if _, err := os.Stat(path); os.IsExist(err) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
 		if _, err = os.Create(path); err != nil {
 			return err
 		}
@@ -26,5 +26,3 @@ func InitShortMemoryFile(path string) error {
 	return nil
 
 }
-
-

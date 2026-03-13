@@ -24,6 +24,7 @@ func main() {
 	agent, err := agent.InitAgent(profileName)
 	if err != nil {
 		fmt.Println("Error occured durning agent initialization: ", err)
+		return
 	}
 	args := os.Args[1:]
 
