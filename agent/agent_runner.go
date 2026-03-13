@@ -12,6 +12,11 @@ import (
 	"github.com/pfczx/goagentai/memory"
 )
 
+func InitMenagerFromConfig(config *Config) (*memory.MemoryMenager,error) {
+
+
+}
+
 func InitAgent(profileName string) (*Agent, error) {
 	path, err := os.UserHomeDir()
 	if err != nil {
