@@ -2,13 +2,14 @@ package memory
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
+	"strings"
 )
 
 type ShortTermMemory struct {
-	Limit   int             `json:"short_term_history_size"`
 	Content []ShortTermPart `json:"conversation"`
 }
 
@@ -21,12 +22,19 @@ type ShortTermPart struct {
 func InitShortMemoryFile(path string) error {
 	path = filepath.Join(path, "shortTermMemory.json")
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		if _, err = os.Create(path); err != nil {
+		memory := ShortTermMemory{
+			Content: []ShortTermPart{},
+		}
+
+		data, err := json.MarshalIndent(memory, "", " ")
+		if err != nil {
 			return err
 		}
-	}
-	return nil
 
+		return os.WriteFile(path, data, 0644)
+	}
+
+	return nil
 }
 
 func LoadShortTermMemory(path string) (*ShortTermMemory, error) {
@@ -57,30 +65,41 @@ func SaveShortTermMemory(path string, memory *ShortTermMemory) error {
 
 }
 
-func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, usefull ...bool) error {
-	part := &ShortTermPart{
+func (m *MemoryMenager) ShortTermToString() string {
+	var out strings.Builder
+	info := fmt.Sprintf("this is last conversations for additional context: ")
+	out.WriteString(info)
+
+	for _, part := range m.ShortTermMemory.Content {
+		stringPart := fmt.Sprintf("User: %s Agent: %s ", part.Prompt, part.Response)
+		if m.ShortTermMemoryEvaluation {
+			stringPart = stringPart + fmt.Sprintf("Usefullness: %t", part.Usefull)
+		}
+		out.WriteString(stringPart)
+	}
+	return out.String()
+
+}
+
+func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, usefull bool) error {
+	part := ShortTermPart{
 		Prompt:   prompt,
 		Response: response,
 	}
-	if len(usefull) > 0 {
-		part.Usefull = usefull[0]
+	if m.ShortTermMemoryEvaluation {
+		part.Usefull = usefull
 	}
-	m.ShortTermMemory.Content = append(m.ShortTermMemory.Content, *part)
+	m.ShortTermMemory.Content = append(m.ShortTermMemory.Content, part)
 
-	if len(m.ShortTermMemory.Content) > m.ShortTermMemory.Limit {
+	if len(m.ShortTermMemory.Content) > m.ShortTermMemoryLimit {
 		//in future, send deleted to long term buffer and summarize
-		m.ShortTermMemory.Content = slices.Delete(m.ShortTermMemory.Content, 0, 1)
+		//remove oldest messages
+		m.ShortTermMemory.Content = slices.Delete(m.ShortTermMemory.Content, 0, len(m.ShortTermMemory.Content)-m.ShortTermMemoryLimit)
 	}
 
-	memoryPath := filepath.Join(m.path, "shortTermMemory.json")
-	err := SaveShortTermMemory(memoryPath, m.ShortTermMemory)
+	err := SaveShortTermMemory(m.path, m.ShortTermMemory)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-
-func (m *MemoryMenager) ShortTermMemoryString()  string {
-	var out 
-
-} 

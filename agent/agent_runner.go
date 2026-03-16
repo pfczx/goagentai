@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
@@ -12,8 +13,18 @@ import (
 	"github.com/pfczx/goagentai/memory"
 )
 
-func InitMenagerFromConfig(config *Config) (*memory.MemoryMenager,error) {
+func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) {
+	menager, err := memory.InitMenager(
+		config.Path,
+		config.MemoryOn,
+		config.ShortTermMemoryLimit,
+		config.ShortTermMemoryEvaluation,
+	)
 
+	if err != nil {
+		return nil, err
+	}
+	return menager, nil
 
 }
 
@@ -31,12 +42,17 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	return NewAgent(profile, &memory.MemoryMenager{}), nil
+	menager, err := InitMemoryMenagerFromConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	return NewAgent(profile, menager), nil
 
 }
 
 func RunAsk(agent *Agent, args ...string) error {
-	resp, err := agent.Ask(strings.Join(args, " "))
+	prompt := strings.Join(args, " ")
+	resp, err := agent.Ask(prompt)
 	if err != nil {
 		return err
 	}
@@ -50,6 +66,21 @@ func RunAsk(agent *Agent, args ...string) error {
 			resp.Usage.PromptTokens,
 			resp.Usage.CompletionTokens,
 			resp.Usage.TotalTokens)
+		if agent.MemoryMenager.MemoryOn {
+			usefull := false
+			if agent.MemoryMenager.ShortTermMemoryEvaluation {
+				sc := bufio.NewScanner(os.Stdin)
+				fmt.Println("Was it usefull? [y/anything]")
+
+				if sc.Scan() {
+					if sc.Text() == "y" {
+						usefull = true
+					}
+				}
+			}
+			agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
+		}
+
 	} else {
 		fmt.Println("(No token usage data available)")
 	}

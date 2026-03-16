@@ -19,7 +19,11 @@ func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager) *Agent {
 }
 
 func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
-	message, err := prompt.BuildAsk(input)
+	var context []string
+	if a.MemoryMenager.MemoryOn {
+		context = append(context, a.MemoryMenager.ShortTermToString())
+	}
+	message, err := prompt.BuildAsk(input, context)
 	if err != nil {
 		return nil, err
 	}

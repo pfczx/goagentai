@@ -10,8 +10,7 @@ type MemoryMenager struct {
 	ShortTermMemory           *ShortTermMemory
 }
 
-func InitMenager(path string, memoryOn bool, shortTermMemoryLimit int, shortTermMemoryEvaluation bool,
-	shortTermMemory *ShortTermMemory) (*MemoryMenager, error) {
+func InitMenager(path string, memoryOn bool, shortTermMemoryLimit int, shortTermMemoryEvaluation bool) (*MemoryMenager, error) {
 
 	shortMemory, err := LoadShortTermMemory(path)
 	if err != nil {
