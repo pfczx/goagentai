@@ -6,28 +6,42 @@ import (
 )
 
 type Config struct {
-	Name                      string  `json:"name"`
-	Path                      string  `json:"path"`
-	Provider                  string  `json:"provider"`
-	IternalProvider           string  `json:"iternalprovider"`
-	Model                     string  `json:"model"`
-	Temperature               float64 `json:"temperature"`
-	MemoryOn                  bool    `json:"memory_on"`
-	ShortTermMemoryLimit      int     `json:"short_term_memory_limit"`
-	ShortTermMemoryEvaluation bool    `json:"short_term_memory_evaluation_on"`
+	Name                                        string  `json:"name"`
+	Path                                        string  `json:"path"`
+	Provider                                    string  `json:"provider"`
+	IternalProvider                             string  `json:"iternalprovider"`
+	Model                                       string  `json:"model"`
+	Temperature                                 float64 `json:"temperature"`
+	MemoryOn                                    bool    `json:"memory_on"`
+	ShortTermMemoryLimit                        int     `json:"short_term_memory_limit"`
+	ShortTermMemoryEvaluation                   bool    `json:"short_term_memory_evaluation_on"`
+	LongTermMemoryChunksToAdd                   int     `json:"long_term_memory_chunks_to_be_added_as_context"`
+	LongTermMemoryBufferSize                    int     `json:"long_term_memory_buffer_size"`
+	LongTermMemoryChunkSize                     int     `json:"long_term_memory_chunk_size"`
+	LongTermMemoryStorageSize                   int     `json:"long_term_memory_storage_size"`
+	LongTermMemorySummarizationProvider         string  `json:"long_term_memory_summarization_provider"`
+	LongTermMemorySummarizationInternalProvider string  `json:"long_term_memory_summarization_internal_provider"`
+	LongTermMemorySummarizationModel            string  `json:"long_term_memory_summarization_model"`
 }
 
 func DefaultConfig(name string, path string) *Config {
 	return &Config{
-		Name:                      name,
-		Path:                      path,
-		Provider:                  "HuggingFace",
-		IternalProvider:           "fireworks-ai",
-		Model:                     "moonshot/Kimi-K2.5",
-		Temperature:               50.0,
-		MemoryOn:                  true,
-		ShortTermMemoryLimit:      20,
-		ShortTermMemoryEvaluation: true,
+		Name:                                name,
+		Path:                                path,
+		Provider:                            "HuggingFace",
+		IternalProvider:                     "groq",
+		Model:                               "openai/gpt-oss-20b",
+		Temperature:                         50.0,
+		MemoryOn:                            true,
+		ShortTermMemoryLimit:                20,
+		ShortTermMemoryEvaluation:           true,
+		LongTermMemoryChunksToAdd:           5,
+		LongTermMemoryBufferSize:            3,
+		LongTermMemoryChunkSize:             100,
+		LongTermMemoryStorageSize:           1000,
+		LongTermMemorySummarizationProvider: "HuggingFace",
+		LongTermMemorySummarizationInternalProvider: "groq",
+		LongTermMemorySummarizationModel:            "openai/gpt-oss-20b",
 	}
 }
 

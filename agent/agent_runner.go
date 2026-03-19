@@ -117,7 +117,7 @@ func Switch(agent *Agent, args ...string) error {
 			return err
 		}
 		agent.Profile.Provider = provider
-	case "iternal-provider":
+	case "internal-provider":
 		agent.Profile.Provider.SwitchIternalProvider(args[1])
 	case "model":
 		agent.Profile.Provider.SwitchModel(args[1])
@@ -149,7 +149,7 @@ func List(agent *Agent, args ...string) error {
 
 		fmt.Print(out)
 
-	case "iternal-providers":
+	case "internal-providers":
 		list, err := agent.Profile.Provider.ListIternalProviders()
 		if err != nil {
 			return err

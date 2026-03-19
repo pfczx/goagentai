@@ -9,7 +9,7 @@ import (
 func SingleRun(agent *agent.Agent, args []string) {
 	commandName := args[0]
 	var cmdArgs []string
-	if len(cmdArgs) > 1 {
+	if len(args) > 1 {
 		cmdArgs = args[1:]
 	}
 	err := HandleCommand(agent, commandName, cmdArgs...)

@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"fmt"
+
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
@@ -33,4 +35,11 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 	}
 	return llmResponse, nil
 
+}
+
+func (a *Agent) PrintMemoryFields(){
+	fmt.Println(a.MemoryMenager.MemoryOn)
+	fmt.Println(a.MemoryMenager.ShortTermMemoryLimit)
+	fmt.Println(a.MemoryMenager.ShortTermMemoryEvaluation)
+	fmt.Println(a.MemoryMenager.ShortTermMemory.Content)
 }

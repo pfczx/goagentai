@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+
+	"github.com/writeas/go-strip-markdown"
 )
 
 type ShortTermMemory struct {
@@ -73,7 +75,7 @@ func (m *MemoryMenager) ShortTermToString() string {
 	for _, part := range m.ShortTermMemory.Content {
 		stringPart := fmt.Sprintf("User: %s Agent: %s ", part.Prompt, part.Response)
 		if m.ShortTermMemoryEvaluation {
-			stringPart = stringPart + fmt.Sprintf("Usefullness: %t", part.Usefull)
+			stringPart = stringPart + fmt.Sprintf("Usefull: %t", part.Usefull)
 		}
 		out.WriteString(stringPart)
 	}
@@ -82,9 +84,17 @@ func (m *MemoryMenager) ShortTermToString() string {
 }
 
 func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, usefull bool) error {
+	responseCleared := func(text string) string {
+		text = stripmd.Strip(text)
+		text = strings.ReplaceAll(text, "\n", " ")
+		text = strings.ReplaceAll(text, "|", " ")
+		text = strings.ReplaceAll(text,"-"," ")
+		return strings.TrimSpace(text)
+
+	}(response)
 	part := ShortTermPart{
 		Prompt:   prompt,
-		Response: response,
+		Response: responseCleared,
 	}
 	if m.ShortTermMemoryEvaluation {
 		part.Usefull = usefull
