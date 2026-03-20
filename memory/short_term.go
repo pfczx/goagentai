@@ -88,7 +88,7 @@ func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, u
 		text = stripmd.Strip(text)
 		text = strings.ReplaceAll(text, "\n", " ")
 		text = strings.ReplaceAll(text, "|", " ")
-		text = strings.ReplaceAll(text,"-"," ")
+		text = strings.ReplaceAll(text, "-", " ")
 		return strings.TrimSpace(text)
 
 	}(response)
@@ -102,9 +102,10 @@ func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, u
 	m.ShortTermMemory.Content = append(m.ShortTermMemory.Content, part)
 
 	if len(m.ShortTermMemory.Content) > m.ShortTermMemoryLimit {
-		//in future, send deleted to long term buffer and summarize
-		//remove oldest messages
-		m.ShortTermMemory.Content = slices.Delete(m.ShortTermMemory.Content, 0, len(m.ShortTermMemory.Content)-m.ShortTermMemoryLimit)
+		//add oldest messages to buffer and remove them from shortterm
+		overflow := len(m.ShortTermMemory.Content) - m.ShortTermMemoryLimit
+		m.SaveShortTermToBuffer(m.ShortTermMemory.Content[0:overflow])
+		m.ShortTermMemory.Content = slices.Delete(m.ShortTermMemory.Content, 0, overflow)
 	}
 
 	err := SaveShortTermMemory(m.path, m.ShortTermMemory)

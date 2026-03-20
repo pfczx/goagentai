@@ -1,0 +1,9 @@
+version: "2"
+
+sql:
+  - engine: "sqlite"
+    schema: "memory/db/schema"
+    queries: "memory/db/queries.sql"
+    gen:
+      go:
+        out: "memory/db/generated"

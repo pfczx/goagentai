@@ -1,6 +1,8 @@
 package prompt
 
 import (
+	"fmt"
+
 	"github.com/pfczx/goagentai/llm"
 )
 
@@ -25,5 +27,23 @@ func BuildAsk(prompt string, context []string) (llm.ChatMessage, error) {
 			Text: prompt,
 		})
 
+	return message, nil
+}
+
+func BuildSummarize(preffered_size int, conversations []string) (llm.ChatMessage, error) {
+	message := llm.ChatMessage{
+		SystemPrompt: fmt.Sprintf(`
+You are an AI assistant. Given the following conversation history, summarize it concisely in no more than %d words. Only include the main points and do not add any new information. 
+		`, preffered_size),
+		Content: []llm.ContentPart{},
+	}
+	for _, conversation := range conversations {
+		message.Content = append(message.Content,
+			llm.ContentPart{
+				Type: "text",
+				Text: conversation,
+			})
+
+	}
 	return message, nil
 }

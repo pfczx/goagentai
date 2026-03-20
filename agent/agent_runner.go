@@ -16,6 +16,7 @@ import (
 func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) {
 	menager, err := memory.InitMenager(
 		config.Path,
+		config.Name,
 		config.MemoryOn,
 		config.ShortTermMemoryLimit,
 		config.ShortTermMemoryEvaluation,

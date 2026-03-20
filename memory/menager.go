@@ -4,6 +4,7 @@ import "github.com/pfczx/goagentai/llm"
 
 type MemoryMenager struct {
 	path                                string
+	profile                             string
 	MemoryOn                            bool
 	ShortTermMemoryLimit                int
 	ShortTermMemoryEvaluation           bool
@@ -15,7 +16,7 @@ type MemoryMenager struct {
 	LongTermMemory                      *LongTermMemory
 }
 
-func InitMenager(path string, memoryOn bool, shortTermMemoryLimit int, shortTermMemoryEvaluation bool) (*MemoryMenager, error) {
+func InitMenager(path string, profile string, memoryOn bool, shortTermMemoryLimit int, shortTermMemoryEvaluation bool) (*MemoryMenager, error) {
 
 	shortMemory, err := LoadShortTermMemory(path)
 	if err != nil {
@@ -23,6 +24,7 @@ func InitMenager(path string, memoryOn bool, shortTermMemoryLimit int, shortTerm
 	}
 	return &MemoryMenager{
 		path:                      path,
+		profile:                   profile,
 		MemoryOn:                  memoryOn,
 		ShortTermMemoryLimit:      shortTermMemoryLimit,
 		ShortTermMemoryEvaluation: shortTermMemoryEvaluation,
