@@ -10,7 +10,7 @@ CREATE TABLE long_term_memory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     profile_id TEXT NOT NULL,
     content TEXT NOT NULL,
-    tf_idf TEXT,
+    tf TEXT,
     keywords TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

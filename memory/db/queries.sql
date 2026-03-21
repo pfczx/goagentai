@@ -11,12 +11,12 @@ WHERE profile_id = ?;
 INSERT INTO long_term_memory (
     profile_id,
     content,
-    tf_idf,
+    tf,
     keywords
 ) VALUES (?, ?, ?, ?);
 
 -- name: GetLongTermByProfile :many
-SELECT id, profile_id, content, tf_idf, keywords, created_at
+SELECT id, profile_id, content, tf, keywords, created_at
 FROM long_term_memory
 WHERE profile_id = ?;
 

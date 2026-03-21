@@ -12,7 +12,7 @@ type LongTermMemory struct {
 	ID        int64
 	ProfileID string
 	Content   string
-	TfIdf     sql.NullString
+	Tf        sql.NullString
 	Keywords  sql.NullString
 	CreatedAt sql.NullTime
 }

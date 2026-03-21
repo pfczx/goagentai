@@ -75,7 +75,7 @@ func (m *MemoryMenager) ShortTermToString() string {
 	for _, part := range m.ShortTermMemory.Content {
 		stringPart := fmt.Sprintf("User: %s Agent: %s ", part.Prompt, part.Response)
 		if m.ShortTermMemoryEvaluation {
-			stringPart = stringPart + fmt.Sprintf("Usefull: %t", part.Usefull)
+			stringPart = stringPart + fmt.Sprintf("Usefull: %t ", part.Usefull)
 		}
 		out.WriteString(stringPart)
 	}

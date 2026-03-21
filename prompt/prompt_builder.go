@@ -33,7 +33,7 @@ func BuildAsk(prompt string, context []string) (llm.ChatMessage, error) {
 func BuildSummarize(preffered_size int, conversations []string) (llm.ChatMessage, error) {
 	message := llm.ChatMessage{
 		SystemPrompt: fmt.Sprintf(`
-You are an AI assistant. Given the following conversation history, summarize it concisely in no more than %d words. Only include the main points and do not add any new information. 
+You are an AI assistant. Given the following conversation history, summarize it concisely in no more than %d words. Only include the main points and do not add any new information. Generate response in simple string. Do not use any special characters and fomratting. 
 		`, preffered_size),
 		Content: []llm.ContentPart{},
 	}

@@ -23,7 +23,8 @@ func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager) *Agent {
 func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 	var context []string
 	if a.MemoryMenager.MemoryOn {
-		context = append(context, a.MemoryMenager.ShortTermToString())
+		shortTermString := a.MemoryMenager.ShortTermToString()
+		context = append(context, shortTermString)
 	}
 	message, err := prompt.BuildAsk(input, context)
 	if err != nil {
@@ -37,7 +38,7 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 
 }
 
-func (a *Agent) PrintMemoryFields(){
+func (a *Agent) PrintMemoryFields() {
 	fmt.Println(a.MemoryMenager.MemoryOn)
 	fmt.Println(a.MemoryMenager.ShortTermMemoryLimit)
 	fmt.Println(a.MemoryMenager.ShortTermMemoryEvaluation)

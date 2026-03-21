@@ -83,7 +83,7 @@ func RunAsk(agent *Agent, args ...string) error {
 		}
 
 	} else {
-		fmt.Println("(No token usage data available)")
+		fmt.Println("no token usage error : runAsk")
 	}
 
 	return nil

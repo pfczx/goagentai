@@ -63,10 +63,10 @@ func (m *MemoryHandler) GetShortTerm(profileID string) ([]generated.ShortTermMem
 	return m.queries.GetShortTermByProfile(ctx, profileID)
 }
 
-func (m *MemoryHandler) SaveLongTerm(profileID, content string, tfidf map[string]float64, keywords []string) error {
+func (m *MemoryHandler) SaveLongTerm(profileID, content string, tf map[string]float32, keywords []string) error {
 	ctx := context.Background()
 
-	tfidfJSON, err := json.Marshal(tfidf)
+	tfJSON, err := json.Marshal(tf)
 	if err != nil {
 		return fmt.Errorf("cannot marshal tfidf: %w", err)
 	}
@@ -78,7 +78,7 @@ func (m *MemoryHandler) SaveLongTerm(profileID, content string, tfidf map[string
 	arg := generated.InsertLongTermParams{
 		ProfileID: profileID,
 		Content:   content,
-		TfIdf:     sql.NullString{String: string(tfidfJSON), Valid: true},
+		Tf:        sql.NullString{String: string(tfJSON), Valid: true},
 		Keywords:  sql.NullString{String: string(keywordsJSON), Valid: true},
 	}
 
@@ -92,4 +92,34 @@ func (m *MemoryHandler) CountShortTerm(profileID string) (int, error) {
 		return 1, err
 	}
 	return int(count), nil
+}
+
+func (m *MemoryHandler) GetLongTerm(profileID string) ([]MemoryChunk, error) {
+	ctx := context.Background()
+	memory, err := m.queries.GetLongTermByProfile(ctx, profileID)
+	if err != nil {
+		return nil, err
+	}
+	var out []MemoryChunk
+	for _, memo := range memory {
+		var tf map[string]float32
+		err := json.Unmarshal([]byte(memo.Tf.String), &tf)
+		if err != nil {
+			return nil, err
+		}
+		var keywords []string
+		err = json.Unmarshal([]byte(memo.Keywords.String), &keywords)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, MemoryChunk{
+			Profile:   profileID,
+			Summary:   memo.Content,
+			TF:        tf,
+			Keywords:  keywords,
+			CreatedAt: memo.CreatedAt.Time,
+		})
+	}
+	return out, nil
+
 }

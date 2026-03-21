@@ -12,6 +12,7 @@ type MemoryMenager struct {
 	LongTermMemoryBufferSize            int
 	LongTermMemoryChunkSize             int
 	LongTermMemoryStorageSize           int
+	LongTermMemoryChunksToAdd           int
 	LongTermMemorySummarizationProvider llm.ModelProvider
 	LongTermMemory                      *LongTermMemory
 }

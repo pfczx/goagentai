@@ -2,31 +2,34 @@ package memory
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/pfczx/goagentai/prompt"
 )
 
 type LongTermMemory struct {
-	handler *MemoryHandler
+	handler  *MemoryHandler
+	analyzer *TextAnalyzer
 }
 
 type MemoryChunk struct {
 	Profile   string
 	Summary   string
-	Embedding []float32
 	Keywords  []string
-	TFIDF     []float32
+	TF        map[string]float32
 	CreatedAt time.Time
 }
 
 func NewLongTermMemory() (*LongTermMemory, error) {
-	handler, err := NewMemoryHandler()
+	h, err := NewMemoryHandler()
 	if err != nil {
 		return nil, err
 	}
+	a := NewTextAnalyzer()
 	return &LongTermMemory{
-		handler: handler,
+		handler:  h,
+		analyzer: a,
 	}, nil
 
 }
@@ -57,19 +60,60 @@ func (m *MemoryMenager) TriggerSummarization() (bool, error) {
 	return false, nil
 }
 
-func (m *MemoryMenager) Summarize() (string,error){
-	prompt,err := prompt.BuildSummarize()
-	if err !=nil{
-		return err
+func (m *MemoryMenager) Summarize() (string, error) {
+	shortTermBuffer, err := m.LongTermMemory.handler.GetShortTerm(m.profile)
+	if err != nil {
+		return "", err
 	}
+	var parts []string
+	for _, part := range shortTermBuffer {
+		parts = append(parts, part.Memory)
+	}
+	prompt, err := prompt.BuildSummarize(m.LongTermMemoryChunkSize, parts)
+	if err != nil {
+		return "", err
+	}
+	resp, err := m.LongTermMemorySummarizationProvider.Generate(prompt)
+	if err != nil {
+		return "", err
+	}
+	if resp.Usage != nil {
+		return resp.Text, nil
+	}
+
+	return "", fmt.Errorf("no token usage error : summarization")
 
 }
 
-
-func (m *MemoryMenager) UpdateLongTerm() (error) {
-	if TriggerSummarization(){
-	
+func (m *MemoryMenager) UpdateLongTerm() error {
+	t, err := m.TriggerSummarization()
+	if err != nil {
+		return err
 	}
+	if t {
+		summarization, err := m.Summarize()
+		if err != nil {
+			return err
+		}
+		tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
+		keywords := m.LongTermMemory.analyzer.ExtractKeywords(tf)
+		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf, keywords)
+
+	}
+
 	return nil
 }
 
+func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {
+	memory, err := m.LongTermMemory.handler.GetLongTerm(m.profile)
+	if err != nil {
+		return "", err
+	}
+	selected := m.LongTermMemory.analyzer.SelectRelevantChunks(input, memory, m.LongTermMemoryChunksToAdd)
+	out := fmt.Sprint("This is long term user history for additional context: ")
+	for _, memo := range selected {
+		out = out + fmt.Sprintf(" %s ", memo.Summary)
+	}
+	return out, nil
+
+}
