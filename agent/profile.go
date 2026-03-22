@@ -137,9 +137,6 @@ OPENROUTER=
 			return err
 		}
 	}
-	_, err = memory.InitDatabase()
-	if err != nil {
-		return err
-	}
+
 	return nil
 }

@@ -24,7 +24,19 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 	var context []string
 	if a.MemoryMenager.MemoryOn {
 		shortTermString := a.MemoryMenager.ShortTermToString()
-		context = append(context, shortTermString)
+		//prompt + short term used for searching relevant long term chunks
+		longTermString, err := a.MemoryMenager.GetLongTermContextString(fmt.Sprintf("%s %s", input, shortTermString))
+		if err != nil {
+			return nil, err
+
+		}
+		if shortTermString != "" {
+			context = append(context, shortTermString)
+		}
+		if longTermString != "" {
+			context = append(context, longTermString)
+		}
+
 	}
 	message, err := prompt.BuildAsk(input, context)
 	if err != nil {
@@ -38,9 +50,11 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 
 }
 
-func (a *Agent) PrintMemoryFields() {
-	fmt.Println(a.MemoryMenager.MemoryOn)
-	fmt.Println(a.MemoryMenager.ShortTermMemoryLimit)
-	fmt.Println(a.MemoryMenager.ShortTermMemoryEvaluation)
-	fmt.Println(a.MemoryMenager.ShortTermMemory.Content)
+func (a *Agent) CloseDB() error {
+	err := a.MemoryMenager.CloseDb()
+	if err != nil {
+		return err
+	}
+	return nil
+
 }

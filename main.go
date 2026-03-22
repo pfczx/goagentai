@@ -26,6 +26,7 @@ func main() {
 		fmt.Println("Error occured durning agent initialization: ", err)
 		return
 	}
+
 	args := os.Args[1:]
 
 	if len(args) == 0 {
@@ -34,4 +35,8 @@ func main() {
 	}
 
 	cli.SingleRun(agent, args)
+	err = agent.CloseDB()
+	if err != nil {
+		fmt.Println(err)
+	}
 }

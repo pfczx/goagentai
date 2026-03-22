@@ -28,8 +28,8 @@ func GetCommands() map[string]CliCommand {
 		"exit": {
 			Name: "exit",
 			Desc: "exit repl",
-			Callback: func(_ *agent.Agent, _ ...string) error {
-				return Exit()
+			Callback: func(a *agent.Agent, _ ...string) error {
+				return Exit(a)
 			},
 		},
 		"help": {

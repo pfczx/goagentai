@@ -71,7 +71,9 @@ func (m *MemoryMenager) ShortTermToString() string {
 	var out strings.Builder
 	info := fmt.Sprintf("this is last conversations for additional context: ")
 	out.WriteString(info)
-
+	if len(m.ShortTermMemory.Content) == 0 {
+		return ""
+	}
 	for _, part := range m.ShortTermMemory.Content {
 		stringPart := fmt.Sprintf("User: %s Agent: %s ", part.Prompt, part.Response)
 		if m.ShortTermMemoryEvaluation {

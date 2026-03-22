@@ -9,10 +9,15 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
+	"github.com/pfczx/goagentai/agent"
 )
 
-func Exit() error {
+func Exit(a *agent.Agent) error {
 	fmt.Println("Good bye!")
+	err := a.CloseDB()
+	if err != nil {
+		fmt.Println(err)
+	}
 	os.Exit(0)
 	return nil
 }
@@ -67,5 +72,3 @@ func PrintState(profileName string, provider string, iternalProvider string, mod
 	fmt.Printf("%s@%s (%s::%s::%s) \n", agent, profile, provider, iternalProvider, model)
 	fmt.Printf("%s ", prompt)
 }
-
-

@@ -5,46 +5,63 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/pfczx/goagentai/memory/db/generated"
-	"github.com/pressly/goose/v3"
+	"io"
+	"log"
 	"os"
 	"path/filepath"
+
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/pfczx/goagentai/memory/db/generated"
+	"github.com/pressly/goose/v3"
 )
 
 type MemoryHandler struct {
+	db      *sql.DB
 	queries *generated.Queries
 }
 
-func InitDatabase() (*generated.Queries, error) {
+func (m *MemoryHandler) CloseDB() error {
+	if m.db == nil {
+		return fmt.Errorf("Unexpected nil value when closing DB")
+	}
+	return m.db.Close()
+}
+
+func InitDatabase() (*sql.DB, *generated.Queries, error) {
 	path, err := os.UserHomeDir()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dbPath := filepath.Join(path, ".config", "goagent", "long_term.db")
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return nil, fmt.Errorf("cannot open database: %w", err)
+		return nil, nil, fmt.Errorf("cannot open database: %w", err)
 	}
-	defer db.Close()
+	//supress goose output 
+	silentLogger := log.New(io.Discard, "", 0)
+	goose.SetLogger(silentLogger)
 	db.SetMaxOpenConns(1)
-
+	if err := goose.SetDialect("sqlite3"); err != nil {
+		return nil, nil, err
+	}
 	migrationsPath := "memory/db/schema"
 	if err := goose.Up(db, migrationsPath); err != nil {
-		return nil, fmt.Errorf("failed to run migrations: %w", err)
+		return nil, nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
-	return generated.New(db), nil
+	return db, generated.New(db), nil
 
 }
 
 func NewMemoryHandler() (*MemoryHandler, error) {
-	q, err := InitDatabase()
+	database, q, err := InitDatabase()
 	if err != nil {
 		return nil, err
 	}
 	return &MemoryHandler{
 		queries: q,
+		db:      database,
 	}, nil
 }
 

@@ -20,6 +20,13 @@ func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) 
 		config.MemoryOn,
 		config.ShortTermMemoryLimit,
 		config.ShortTermMemoryEvaluation,
+		config.LongTermMemoryBufferSize,
+		config.LongTermMemoryChunkSize,
+		config.LongTermMemoryStorageSize,
+		config.LongTermMemoryChunksToAdd,
+		config.LongTermMemorySummarizationProvider,
+		config.LongTermMemorySummarizationInternalProvider,
+		config.LongTermMemorySummarizationModel,
 	)
 
 	if err != nil {
@@ -80,10 +87,13 @@ func RunAsk(agent *Agent, args ...string) error {
 				}
 			}
 			agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
+			if err = agent.MemoryMenager.UpdateLongTerm(); err != nil {
+				return err
+			}
 		}
 
 	} else {
-		fmt.Println("no token usage error : runAsk")
+		fmt.Println("no token usage error : RunAsk")
 	}
 
 	return nil
@@ -92,6 +102,14 @@ func RunAsk(agent *Agent, args ...string) error {
 func Switch(agent *Agent, args ...string) error {
 	switch args[0] {
 	case "profile":
+		newAgent, err := InitAgent(args[1])
+		if err != nil {
+			return err
+		}
+
+		*agent = *newAgent
+		return nil
+	/*
 		path, err := os.UserHomeDir()
 		if err != nil {
 			return err
@@ -110,6 +128,7 @@ func Switch(agent *Agent, args ...string) error {
 		if err != nil {
 			return err
 		}
+	*/
 	case "provider":
 		provider, err := llm.NewProvider(args[1],
 			agent.Profile.Provider.ModelName(),

@@ -2,7 +2,6 @@ package memory
 
 import (
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/pfczx/goagentai/prompt"
@@ -19,6 +18,10 @@ type MemoryChunk struct {
 	Keywords  []string
 	TF        map[string]float32
 	CreatedAt time.Time
+}
+
+func (m *MemoryMenager) CloseDb() error {
+	return m.LongTermMemory.handler.CloseDB()
 }
 
 func NewLongTermMemory() (*LongTermMemory, error) {
@@ -110,7 +113,10 @@ func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {
 		return "", err
 	}
 	selected := m.LongTermMemory.analyzer.SelectRelevantChunks(input, memory, m.LongTermMemoryChunksToAdd)
-	out := fmt.Sprint("This is long term user history for additional context: ")
+	out := fmt.Sprint("This is long term chunks of summarized user history for additional context: ")
+	if len(selected) == 0 {
+		return "", nil
+	}
 	for _, memo := range selected {
 		out = out + fmt.Sprintf(" %s ", memo.Summary)
 	}
