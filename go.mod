@@ -7,7 +7,9 @@ require (
 	github.com/duynguyendang/meb v0.0.0-20260320060852-7782689754ae
 	github.com/fatih/color v1.18.0
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.37
 	github.com/pressly/goose/v3 v3.27.0
+	github.com/securisec/go-keywords v0.0.0-20200619134240-769e7273f2ed
 	github.com/writeas/go-strip-markdown v2.0.1+incompatible
 )
 
@@ -32,12 +34,12 @@ require (
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
+	github.com/grokify/html-strip-tags-go v0.0.0-20200322061010-ea0c1cf2f119 // indirect
 	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.21 // indirect
-	github.com/mattn/go-sqlite3 v1.14.37 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/microcosm-cc/bluemonday v1.0.27 // indirect
 	github.com/muesli/reflow v0.3.0 // indirect

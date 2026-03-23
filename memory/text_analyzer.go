@@ -2,6 +2,7 @@ package memory
 
 import (
 	"github.com/duynguyendang/meb/vector"
+	"github.com/securisec/go-keywords"
 	"sort"
 	"strings"
 	"unicode"
@@ -65,14 +66,11 @@ func (t *TextAnalyzer) ComputeTF(text string) map[string]float32 {
 	return tf
 }
 
-func (t *TextAnalyzer) ExtractKeywords(tf map[string]float32) []string {
-	var keywords []string
-
-	for word, score := range tf {
-		if score > t.keywordTreshold {
-			keywords = append(keywords, word)
-		}
+func (t *TextAnalyzer) ExtractKeywords(text string) []string {
+	opts := keywords.ExtractOptions{
+		IgnoreLength: 0,
 	}
+	keywords, _ := keywords.Extract(text, opts)
 
 	return keywords
 }
@@ -81,19 +79,23 @@ func tfMapsToVectorsShared(queryTF, chunkTF map[string]float32) ([]float32, []fl
 	vecQuery := []float32{}
 	vecChunk := []float32{}
 
-	for word, qVal := range queryTF {
-		if cVal, ok := chunkTF[word]; ok {
-			vecQuery = append(vecQuery, qVal)
-			vecChunk = append(vecChunk, cVal)
-		}
+	vocab := make(map[string]struct{})
+	for w := range queryTF {
+		vocab[w] = struct{}{}
 	}
-
+	for w := range chunkTF {
+		vocab[w] = struct{}{}
+	}
+	for w := range vocab {
+		vecQuery = append(vecQuery, queryTF[w])
+		vecChunk = append(vecChunk, chunkTF[w])
+	}
 	return vecQuery, vecChunk
 }
 
 func (t *TextAnalyzer) SelectRelevantChunks(input string, chunks []MemoryChunk, topN int) []MemoryChunk {
 	queryTF := t.ComputeTF(input)
-	queryKeywords := t.ExtractKeywords(queryTF)
+	queryKeywords := t.ExtractKeywords(input)
 
 	type scoredChunk struct {
 		chunk MemoryChunk

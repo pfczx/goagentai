@@ -10,6 +10,16 @@ import (
 	"database/sql"
 )
 
+const clearShortTermMemoryByProfile = `-- name: ClearShortTermMemoryByProfile :exec
+DELETE FROM short_term_memory
+WHERE profile_id = ?
+`
+
+func (q *Queries) ClearShortTermMemoryByProfile(ctx context.Context, profileID string) error {
+	_, err := q.db.ExecContext(ctx, clearShortTermMemoryByProfile, profileID)
+	return err
+}
+
 const countShortTermByProfile = `-- name: CountShortTermByProfile :one
 SELECT COUNT(*) 
 FROM short_term_memory
@@ -21,6 +31,27 @@ func (q *Queries) CountShortTermByProfile(ctx context.Context, profileID string)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
+}
+
+const deleteOldLongTermForProfile = `-- name: DeleteOldLongTermForProfile :exec
+DELETE FROM long_term_memory AS ltm
+WHERE ltm.id IN (
+    SELECT sub.id
+    FROM long_term_memory AS sub
+    WHERE sub.profile_id = ?
+    ORDER BY sub.created_at ASC
+    LIMIT ?
+)
+`
+
+type DeleteOldLongTermForProfileParams struct {
+	ProfileID string
+	Limit     int64
+}
+
+func (q *Queries) DeleteOldLongTermForProfile(ctx context.Context, arg DeleteOldLongTermForProfileParams) error {
+	_, err := q.db.ExecContext(ctx, deleteOldLongTermForProfile, arg.ProfileID, arg.Limit)
+	return err
 }
 
 const getLongTermByProfile = `-- name: GetLongTermByProfile :many
@@ -132,4 +163,17 @@ type InsertShortTermParams struct {
 func (q *Queries) InsertShortTerm(ctx context.Context, arg InsertShortTermParams) error {
 	_, err := q.db.ExecContext(ctx, insertShortTerm, arg.ProfileID, arg.Memory)
 	return err
+}
+
+const longTermMemorySizeForProfile = `-- name: LongTermMemorySizeForProfile :one
+SELECT COUNT(*)
+FROM long_term_memory
+WHERE profile_id = ?
+`
+
+func (q *Queries) LongTermMemorySizeForProfile(ctx context.Context, profileID string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, longTermMemorySizeForProfile, profileID)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }

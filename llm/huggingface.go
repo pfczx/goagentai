@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type HuggingFace struct {
@@ -155,9 +154,7 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 		}
 	}
 
-	if strings.Contains(responseText, "error") {
-		fmt.Println(string(respBody))
-	}
+
 	return &ChatResponse{
 		Text:  responseText,
 		Usage: usage,

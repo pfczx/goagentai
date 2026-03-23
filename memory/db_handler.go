@@ -38,7 +38,7 @@ func InitDatabase() (*sql.DB, *generated.Queries, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot open database: %w", err)
 	}
-	//supress goose output 
+	//supress goose output
 	silentLogger := log.New(io.Discard, "", 0)
 	goose.SetLogger(silentLogger)
 	db.SetMaxOpenConns(1)
@@ -80,6 +80,34 @@ func (m *MemoryHandler) GetShortTerm(profileID string) ([]generated.ShortTermMem
 	return m.queries.GetShortTermByProfile(ctx, profileID)
 }
 
+func (m *MemoryHandler) ClearShortTerm(profileID string) error {
+	ctx := context.Background()
+	return m.queries.ClearShortTermMemoryByProfile(ctx, profileID)
+
+}
+
+func (m *MemoryHandler) TrimLongTermToStorageSize(profileID string, size int) error {
+	ctx := context.Background()
+	count, err := m.queries.LongTermMemorySizeForProfile(ctx, profileID)
+	if err != nil {
+		return err
+	}
+
+	limit := count - int64(size)
+	if limit <= 0 {
+
+		return nil
+	}
+
+	params := generated.DeleteOldLongTermForProfileParams{
+		ProfileID: profileID,
+		Limit:     limit,
+	}
+
+	return m.queries.DeleteOldLongTermForProfile(ctx, params)
+
+}
+
 func (m *MemoryHandler) SaveLongTerm(profileID, content string, tf map[string]float32, keywords []string) error {
 	ctx := context.Background()
 
@@ -98,6 +126,8 @@ func (m *MemoryHandler) SaveLongTerm(profileID, content string, tf map[string]fl
 		Tf:        sql.NullString{String: string(tfJSON), Valid: true},
 		Keywords:  sql.NullString{String: string(keywordsJSON), Valid: true},
 	}
+	fmt.Println("TF VALUES:::", arg.Tf)
+	fmt.Println("KEYWORDS:::", arg.Keywords.String)
 
 	return m.queries.InsertLongTerm(ctx, arg)
 }

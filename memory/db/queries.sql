@@ -24,3 +24,22 @@ WHERE profile_id = ?;
 SELECT COUNT(*) 
 FROM short_term_memory
 WHERE profile_id = ?;
+
+-- name: ClearShortTermMemoryByProfile :exec
+DELETE FROM short_term_memory
+WHERE profile_id = ?;
+
+-- name: LongTermMemorySizeForProfile :one
+SELECT COUNT(*)
+FROM long_term_memory
+WHERE profile_id = ?;
+
+-- name: DeleteOldLongTermForProfile :exec
+DELETE FROM long_term_memory AS ltm
+WHERE ltm.id IN (
+    SELECT sub.id
+    FROM long_term_memory AS sub
+    WHERE sub.profile_id = ?
+    ORDER BY sub.created_at ASC
+    LIMIT ?
+);

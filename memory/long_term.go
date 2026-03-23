@@ -99,8 +99,16 @@ func (m *MemoryMenager) UpdateLongTerm() error {
 			return err
 		}
 		tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
-		keywords := m.LongTermMemory.analyzer.ExtractKeywords(tf)
+		keywords := m.LongTermMemory.analyzer.ExtractKeywords(summarization)
 		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf, keywords)
+		err = m.LongTermMemory.handler.ClearShortTerm(m.profile)
+		if err != nil {
+			return err
+		}
+		err = m.LongTermMemory.handler.TrimLongTermToStorageSize(m.profile, m.LongTermMemoryStorageSize)
+		if err != nil {
+			return err
+		}
 
 	}
 
