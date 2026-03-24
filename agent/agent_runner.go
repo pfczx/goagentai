@@ -101,7 +101,7 @@ func RunAsk(agent *Agent, args ...string) error {
 
 func Switch(agent *Agent, args ...string) error {
 	switch args[0] {
-	case "profile":
+	case "profile", "p":
 		newAgent, err := InitAgent(args[1])
 		if err != nil {
 			return err
@@ -129,7 +129,7 @@ func Switch(agent *Agent, args ...string) error {
 			return err
 		}
 	*/
-	case "provider":
+	case "provider", "pv":
 		provider, err := llm.NewProvider(args[1],
 			agent.Profile.Provider.ModelName(),
 			agent.Profile.Provider.IternalProviderName())
@@ -137,9 +137,9 @@ func Switch(agent *Agent, args ...string) error {
 			return err
 		}
 		agent.Profile.Provider = provider
-	case "internal-provider":
+	case "internal-provider", "ip":
 		agent.Profile.Provider.SwitchIternalProvider(args[1])
-	case "model":
+	case "model", "m":
 		agent.Profile.Provider.SwitchModel(args[1])
 	default:
 		return fmt.Errorf("First argument is not valid")
@@ -155,7 +155,31 @@ func Switch(agent *Agent, args ...string) error {
 func List(agent *Agent, args ...string) error {
 	var builder strings.Builder
 	switch args[0] {
-	case "providers":
+	case "profiles", "p":
+		path, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		path = filepath.Join(path, ".config", "goagent", "profiles")
+
+		entries, err := os.ReadDir(path)
+		if err != nil {
+			return fmt.Errorf("cannot read profiles directory: %w", err)
+		}
+
+		builder.WriteString("# Available profiles\n\n")
+		for _, entry := range entries {
+			if entry.IsDir() {
+				builder.WriteString("## " + entry.Name() + "\n")
+			}
+		}
+
+		out, err := glamour.Render(builder.String(), "auto")
+		if err != nil {
+			return err
+		}
+		fmt.Print(out)
+	case "providers", "pv":
 		list := llm.ListProviders()
 		builder.WriteString("# Currently availble providers\n\n")
 		for _, provider := range list {
@@ -169,7 +193,7 @@ func List(agent *Agent, args ...string) error {
 
 		fmt.Print(out)
 
-	case "internal-providers":
+	case "internal-providers","ip":
 		list, err := agent.Profile.Provider.ListIternalProviders()
 		if err != nil {
 			return err
@@ -186,7 +210,7 @@ func List(agent *Agent, args ...string) error {
 		}
 
 		fmt.Print(out)
-	case "models":
+	case "models", "m":
 		withPhoto := false
 		if len(args) > 1 && args[1] == "--image" {
 			withPhoto = true

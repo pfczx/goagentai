@@ -7,11 +7,15 @@ import (
 
 type CliCommand struct {
 	Name     string
+	Alias    string
 	Desc     string
 	Callback func(agent *agent.Agent, args ...string) error
 }
 
 func HandleCommand(agent *agent.Agent, commandName string, args ...string) error {
+	if full, ok := Aliases[commandName]; ok {
+		commandName = full
+	}
 	commands := GetCommands()
 	if cmd, exists := commands[commandName]; exists {
 		if err := cmd.Callback(agent, args...); err != nil {
@@ -21,6 +25,16 @@ func HandleCommand(agent *agent.Agent, commandName string, args ...string) error
 		return fmt.Errorf("Command does not exists, type help for help :P")
 	}
 	return nil
+}
+
+var Aliases = map[string]string{
+	"q": "exit",
+	"h": "help",
+	"i": "init",
+	"a": "ask",
+	"s": "switch",
+	"l": "list",
+	"c": "config",
 }
 
 func GetCommands() map[string]CliCommand {
