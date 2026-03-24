@@ -26,6 +26,7 @@ func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
 		shortTermString := a.MemoryMenager.ShortTermToString()
 		//prompt + short term used for searching relevant long term chunks
 		longTermString, err := a.MemoryMenager.GetLongTermContextString(fmt.Sprintf("%s %s", input, shortTermString))
+
 		if err != nil {
 			return nil, err
 

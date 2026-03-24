@@ -10,8 +10,7 @@ CREATE TABLE long_term_memory (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     profile_id TEXT NOT NULL,
     content TEXT NOT NULL,
-    tf TEXT,
-    keywords TEXT,
+    tf TEXT, -- JSON map[string]float32
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

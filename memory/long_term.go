@@ -2,6 +2,7 @@ package memory
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/pfczx/goagentai/prompt"
@@ -10,12 +11,13 @@ import (
 type LongTermMemory struct {
 	handler  *MemoryHandler
 	analyzer *TextAnalyzer
+	idf      map[string]float32
+	docCount int
 }
 
 type MemoryChunk struct {
 	Profile   string
 	Summary   string
-	Keywords  []string
 	TF        map[string]float32
 	CreatedAt time.Time
 }
@@ -24,17 +26,47 @@ func (m *MemoryMenager) CloseDb() error {
 	return m.LongTermMemory.handler.CloseDB()
 }
 
-func NewLongTermMemory() (*LongTermMemory, error) {
+func NewLongTermMemory(profileID string) (*LongTermMemory, error) {
 	h, err := NewMemoryHandler()
 	if err != nil {
 		return nil, err
 	}
 	a := NewTextAnalyzer()
-	return &LongTermMemory{
+	longTermMemory := &LongTermMemory{
 		handler:  h,
 		analyzer: a,
-	}, nil
+	}
+	allChunks, err := h.GetLongTerm(profileID)
+	if err != nil {
+		return nil, err
+	}
+	longTermMemory.buildIDF(allChunks)
 
+	return longTermMemory, nil
+
+}
+
+func (m *LongTermMemory) buildIDF(chunks []MemoryChunk) {
+	df := make(map[string]int)
+	N := float32(len(chunks))
+
+	for _, c := range chunks {
+		seen := make(map[string]bool)
+		for w := range c.TF {
+			if !seen[w] {
+				df[w]++
+				seen[w] = true
+			}
+		}
+	}
+
+	idf := make(map[string]float32)
+	for w, count := range df {
+		idf[w] = float32(math.Log(1 + float64(N/(1+float32(count)))))
+	}
+
+	m.idf = idf
+	m.docCount = int(N)
 }
 
 func (m *MemoryMenager) SaveShortTermToBuffer(parts []ShortTermPart) error {
@@ -99,8 +131,7 @@ func (m *MemoryMenager) UpdateLongTerm() error {
 			return err
 		}
 		tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
-		keywords := m.LongTermMemory.analyzer.ExtractKeywords(summarization)
-		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf, keywords)
+		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf)
 		err = m.LongTermMemory.handler.ClearShortTerm(m.profile)
 		if err != nil {
 			return err
@@ -111,7 +142,11 @@ func (m *MemoryMenager) UpdateLongTerm() error {
 		}
 
 	}
-
+	chunks, err := m.LongTermMemory.handler.GetLongTerm(m.profile)
+	if err != nil {
+		return err
+	}
+	m.LongTermMemory.buildIDF(chunks)
 	return nil
 }
 
@@ -120,13 +155,13 @@ func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	selected := m.LongTermMemory.analyzer.SelectRelevantChunks(input, memory, m.LongTermMemoryChunksToAdd)
+	selected := m.LongTermMemory.analyzer.SelectRelevantChunks(input, memory, m.LongTermMemory.idf, m.LongTermMemoryChunksToAdd)
 	out := fmt.Sprint("This is long term chunks of summarized user history for additional context: ")
 	if len(selected) == 0 {
 		return "", nil
 	}
-	for _, memo := range selected {
-		out = out + fmt.Sprintf(" %s ", memo.Summary)
+	for num, memo := range selected {
+		out = out + fmt.Sprintf("%d %s ",num, memo.Summary)
 	}
 	return out, nil
 

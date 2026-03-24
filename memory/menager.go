@@ -33,7 +33,7 @@ func InitMenager(path string, profile string, memoryOn bool,
 	if err != nil {
 		return nil, err
 	}
-	longTermMemory, err := NewLongTermMemory()
+	longTermMemory, err := NewLongTermMemory(profile)
 	if err != nil {
 		return nil, err
 	}

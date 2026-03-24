@@ -63,17 +63,27 @@ func (c *Config) ProfileFromConfig() (*Profile, error) {
 	), nil
 }
 
-func (p *Profile) UpdateConfigFromProfile() error {
+func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 	config := &Config{
-		Path:            p.Path,
-		Name:            p.Name,
-		Provider:        p.Provider.Name(),
-		IternalProvider: p.Provider.IternalProviderName(),
-		Model:           p.Provider.ModelName(),
-		Temperature:     p.Temperature,
+		Path:                                p.Path,
+		Name:                                p.Name,
+		Provider:                            p.Provider.Name(),
+		IternalProvider:                     p.Provider.IternalProviderName(),
+		Model:                               p.Provider.ModelName(),
+		Temperature:                         p.Temperature,
+		MemoryOn:                            m.MemoryOn,
+		ShortTermMemoryLimit:                m.ShortTermMemoryLimit,
+		ShortTermMemoryEvaluation:           m.ShortTermMemoryEvaluation,
+		LongTermMemoryChunksToAdd:           m.LongTermMemoryChunksToAdd,
+		LongTermMemoryBufferSize:            m.LongTermMemoryBufferSize,
+		LongTermMemoryChunkSize:             m.LongTermMemoryChunkSize,
+		LongTermMemoryStorageSize:           m.LongTermMemoryStorageSize,
+		LongTermMemorySummarizationProvider: m.LongTermMemorySummarizationProvider.Name(),
+		LongTermMemorySummarizationInternalProvider: m.LongTermMemorySummarizationProvider.IternalProviderName(),
+		LongTermMemorySummarizationModel:            m.LongTermMemorySummarizationProvider.ModelName(),
 	}
 	p.Config = config
-	err := SaveConfig(filepath.Join(p.Path, "config.json"), config)
+	err := SaveConfig(filepath.Join(p.Path, "config"), config)
 	if err != nil {
 		return err
 	}
@@ -91,7 +101,7 @@ func InitProfile(args ...string) error {
 			return err
 		}
 	}
-	configPath := filepath.Join(path, "config.json")
+	configPath := filepath.Join(path, "config")
 
 	if _, err = os.Stat(configPath); os.IsNotExist(err) {
 		if err := SaveConfig(configPath, DefaultConfig(args[0], path)); err != nil {

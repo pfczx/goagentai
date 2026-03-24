@@ -41,7 +41,7 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	path = filepath.Join(path, ".config", "goagent", "profiles", profileName, "config.json")
+	path = filepath.Join(path, ".config", "goagent", "profiles", profileName, "config")
 	config, err := LoadConfig(path)
 	if err != nil {
 		return nil, err
@@ -144,7 +144,7 @@ func Switch(agent *Agent, args ...string) error {
 	default:
 		return fmt.Errorf("First argument is not valid")
 	}
-	err := agent.Profile.UpdateConfigFromProfile()
+	err := agent.Profile.UpdateConfigFromProfile(agent.MemoryMenager)
 	if err != nil {
 		return err
 	}
@@ -216,7 +216,7 @@ func List(agent *Agent, args ...string) error {
 }
 
 func EditConfig(agent *Agent, args ...string) error {
-	configPath := filepath.Join(agent.Profile.Path, "config.json")
+	configPath := filepath.Join(agent.Profile.Path, "config")
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "nano"

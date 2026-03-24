@@ -36,11 +36,11 @@ func (q *Queries) CountShortTermByProfile(ctx context.Context, profileID string)
 const deleteOldLongTermForProfile = `-- name: DeleteOldLongTermForProfile :exec
 DELETE FROM long_term_memory AS ltm
 WHERE ltm.id IN (
-    SELECT sub.id
-    FROM long_term_memory AS sub
-    WHERE sub.profile_id = ?
-    ORDER BY sub.created_at ASC
-    LIMIT ?
+  SELECT sub.id 
+  FROM long_term_memory AS sub 
+  WHERE sub.profile_id = ? 
+  ORDER BY sub.created_at ASC 
+  LIMIT ?
 )
 `
 
@@ -55,7 +55,7 @@ func (q *Queries) DeleteOldLongTermForProfile(ctx context.Context, arg DeleteOld
 }
 
 const getLongTermByProfile = `-- name: GetLongTermByProfile :many
-SELECT id, profile_id, content, tf, keywords, created_at
+SELECT id, profile_id, content, tf, created_at
 FROM long_term_memory
 WHERE profile_id = ?
 `
@@ -74,7 +74,6 @@ func (q *Queries) GetLongTermByProfile(ctx context.Context, profileID string) ([
 			&i.ProfileID,
 			&i.Content,
 			&i.Tf,
-			&i.Keywords,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -128,25 +127,18 @@ const insertLongTerm = `-- name: InsertLongTerm :exec
 INSERT INTO long_term_memory (
     profile_id,
     content,
-    tf,
-    keywords
-) VALUES (?, ?, ?, ?)
+    tf
+) VALUES (?, ?, ?)
 `
 
 type InsertLongTermParams struct {
 	ProfileID string
 	Content   string
 	Tf        sql.NullString
-	Keywords  sql.NullString
 }
 
 func (q *Queries) InsertLongTerm(ctx context.Context, arg InsertLongTermParams) error {
-	_, err := q.db.ExecContext(ctx, insertLongTerm,
-		arg.ProfileID,
-		arg.Content,
-		arg.Tf,
-		arg.Keywords,
-	)
+	_, err := q.db.ExecContext(ctx, insertLongTerm, arg.ProfileID, arg.Content, arg.Tf)
 	return err
 }
 
