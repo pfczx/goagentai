@@ -9,6 +9,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.37
 	github.com/pressly/goose/v3 v3.27.0
 	github.com/writeas/go-strip-markdown v2.0.1+incompatible
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -43,5 +44,4 @@ require (
 	golang.org/x/sys v0.42.0 // indirect
 	golang.org/x/term v0.40.0 // indirect
 	golang.org/x/text v0.34.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -193,7 +193,7 @@ func List(agent *Agent, args ...string) error {
 
 		fmt.Print(out)
 
-	case "internal-providers","ip":
+	case "internal-providers", "ip":
 		list, err := agent.Profile.Provider.ListIternalProviders()
 		if err != nil {
 			return err

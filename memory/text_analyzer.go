@@ -5,7 +5,6 @@ import (
 	"sort"
 	"strings"
 	"unicode"
-
 )
 
 type TextAnalyzer struct {
@@ -82,8 +81,6 @@ func (t *TextAnalyzer) CosineSimilarity(a, b map[string]float32) float32 {
 	return dot / (float32(math.Sqrt(float64(magA))) * float32(math.Sqrt(float64(magB))))
 }
 
-
-
 func (t *TextAnalyzer) SelectRelevantChunks(query string, chunks []MemoryChunk, idf map[string]float32, topN int) []MemoryChunk {
 	queryTF := t.ComputeTF(query)
 	queryTFIDF := make(map[string]float32)
@@ -111,7 +108,6 @@ func (t *TextAnalyzer) SelectRelevantChunks(query string, chunks []MemoryChunk, 
 		}
 		scored = append(scored, scoredChunk{chunk: c, score: score})
 	}
-
 
 	sort.Slice(scored, func(i, j int) bool {
 		return scored[i].score > scored[j].score

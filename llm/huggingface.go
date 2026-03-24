@@ -154,7 +154,6 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 		}
 	}
 
-
 	return &ChatResponse{
 		Text:  responseText,
 		Usage: usage,

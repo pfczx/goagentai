@@ -161,7 +161,7 @@ func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {
 		return "", nil
 	}
 	for num, memo := range selected {
-		out = out + fmt.Sprintf("%d %s ",num, memo.Summary)
+		out = out + fmt.Sprintf("%d %s ", num, memo.Summary)
 	}
 	return out, nil
 
