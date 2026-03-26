@@ -32,6 +32,8 @@ func Help() error {
 
 	for _, cmd := range commands {
 		builder.WriteString(fmt.Sprintf("### `%s`\n\n", cmd.Name))
+		builder.WriteString("Alias: " + cmd.Alias)
+		builder.WriteString("\n\n")
 		builder.WriteString(cmd.Desc)
 		builder.WriteString("\n\n")
 	}

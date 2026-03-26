@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/glamour"
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
+	"github.com/pfczx/goagentai/workspace"
 )
 
 func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) {
@@ -50,11 +51,13 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	menager, err := InitMemoryMenagerFromConfig(config)
+	Memorymenager, err := InitMemoryMenagerFromConfig(config)
 	if err != nil {
 		return nil, err
 	}
-	return NewAgent(profile, menager), nil
+	WorkspaceMenager := workspace.NewWorkspaceMenager()
+
+	return NewAgent(profile, Memorymenager, WorkspaceMenager), nil
 
 }
 
