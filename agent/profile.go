@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -91,6 +92,9 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 }
 
 func InitProfile(args ...string) error {
+	if ProfileExists(args[0]) {
+		return fmt.Errorf("Profile with this name arleady exists")
+	}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -113,6 +117,22 @@ func InitProfile(args ...string) error {
 		return err
 	}
 	return nil
+}
+
+func ProfileExists(name string) bool {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return false
+	}
+
+	path := filepath.Join(homeDir, ".config", "goagent", "profiles", name)
+
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+
+	return info.IsDir()
 }
 
 func FirstInitialize() error {

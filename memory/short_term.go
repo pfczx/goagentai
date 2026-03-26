@@ -116,3 +116,12 @@ func (m *MemoryMenager) AppendShortTermHistory(prompt string, response string, u
 	}
 	return nil
 }
+
+func (m *MemoryMenager) ClearShortTerm() error {
+	m.ShortTermMemory.Content = nil
+	err := SaveShortTermMemory(m.path, m.ShortTermMemory)
+	if err != nil {
+		return err
+	}
+	return nil
+}

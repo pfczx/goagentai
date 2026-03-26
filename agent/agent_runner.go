@@ -112,26 +112,7 @@ func Switch(agent *Agent, args ...string) error {
 
 		*agent = *newAgent
 		return nil
-	/*
-		path, err := os.UserHomeDir()
-		if err != nil {
-			return err
-		}
-		path = filepath.Join(path, ".config", "goagent", "profiles", args[1], "config.json")
-		conf, err := LoadConfig(path)
-		if err != nil {
-			return err
-		}
-		profile, err := conf.ProfileFromConfig()
-		if err != nil {
-			return err
-		}
-		agent.Profile = profile
-		err = agent.Profile.SaveLatestUsedProfileName()
-		if err != nil {
-			return err
-		}
-	*/
+
 	case "provider", "pv":
 		provider, err := llm.NewProvider(args[1],
 			agent.Profile.Provider.ModelName(),

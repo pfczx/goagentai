@@ -157,3 +157,8 @@ func (m *MemoryHandler) GetLongTerm(profileID string) ([]MemoryChunk, error) {
 	return out, nil
 
 }
+
+func (m *MemoryHandler) ClearLongTerm(profileID string) error {
+	ctx := context.Background()
+	return m.queries.ClearLongMemory(ctx, profileID)
+}

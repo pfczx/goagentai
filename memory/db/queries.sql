@@ -49,3 +49,8 @@ WHERE ltm.id IN (
   ORDER BY sub.created_at ASC 
   LIMIT ?
 );
+
+-- name: ClearLongMemory :exec
+DELETE FROM long_term_memory WHERE profile_id = ?;
+
+

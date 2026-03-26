@@ -10,6 +10,15 @@ import (
 	"database/sql"
 )
 
+const clearLongMemory = `-- name: ClearLongMemory :exec
+DELETE FROM long_term_memory WHERE profile_id = ?
+`
+
+func (q *Queries) ClearLongMemory(ctx context.Context, profileID string) error {
+	_, err := q.db.ExecContext(ctx, clearLongMemory, profileID)
+	return err
+}
+
 const clearShortTermMemoryByProfile = `-- name: ClearShortTermMemoryByProfile :exec
 DELETE FROM short_term_memory
 WHERE profile_id = ?

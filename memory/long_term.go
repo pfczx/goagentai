@@ -166,3 +166,11 @@ func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {
 	return out, nil
 
 }
+
+func (m *MemoryMenager) ClearLongTermMemory(profileID string) error {
+	err := m.LongTermMemory.handler.ClearShortTerm(profileID)
+	if err != nil {
+		return err
+	}
+	return m.LongTermMemory.handler.ClearLongTerm(profileID)
+}

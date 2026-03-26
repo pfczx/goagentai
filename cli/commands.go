@@ -90,6 +90,12 @@ func GetCommands() map[string]CliCommand {
 			Desc:     "Execute workspace command provided in first argumet \n\nfirst arguments -> \n\ndd : a [filepath or directory] -p (p flag for persistent adding, without flag all content of workspace is erased after next ask)\n\nremove : r [filepath or directory] or all (clearing all workspace content) \n\nlist : l (listing all workspace content) all flag for listing with content",
 			Callback: agent.Workspace,
 		},
+		"remove": {
+			Name:     "remove",
+			Alias:    "r",
+			Desc:     "Removes specified thing in firts argument \n\nfirst arguments -> \n\nprofile : p [profile_name]\n\nhistory : h [history_type] (long-term : lt or short-term : st) ",
+			Callback: agent.Remove,
+		},
 	}
 	return commands
 }
