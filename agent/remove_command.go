@@ -51,7 +51,9 @@ func Remove(a *Agent, args ...string) error {
 		} else {
 			return fmt.Errorf("Wrong history type argument")
 		}
-
+	case "used-tokens", "ut":
+		a.TokenMenager.ResetUsage()
+		return nil
 	}
 	return fmt.Errorf("Wrong first argument")
 }

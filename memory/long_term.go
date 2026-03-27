@@ -95,10 +95,10 @@ func (m *MemoryMenager) TriggerSummarization() (bool, error) {
 	return false, nil
 }
 
-func (m *MemoryMenager) Summarize() (string, error) {
+func (m *MemoryMenager) Summarize() (string, int, error) {
 	shortTermBuffer, err := m.LongTermMemory.handler.GetShortTerm(m.profile)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	var parts []string
 	for _, part := range shortTermBuffer {
@@ -106,48 +106,50 @@ func (m *MemoryMenager) Summarize() (string, error) {
 	}
 	prompt, err := prompt.BuildSummarize(m.LongTermMemoryChunkSize, parts)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	resp, err := m.LongTermMemorySummarizationProvider.Generate(prompt)
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
 	if resp.Usage != nil {
-		return resp.Text, nil
+		return resp.Text, resp.Usage.TotalTokens, nil
 	}
 
-	return "", fmt.Errorf("no token usage error : summarization")
+	return "", 0, fmt.Errorf("no token usage error : summarization")
 
 }
 
-func (m *MemoryMenager) UpdateLongTerm() error {
+func (m *MemoryMenager) UpdateLongTerm() (int, error) {
 	t, err := m.TriggerSummarization()
 	if err != nil {
-		return err
+		return 0, err
 	}
+	usedTokens := 0
 	if t {
-		summarization, err := m.Summarize()
+		summarization, used, err := m.Summarize()
 		if err != nil {
-			return err
+			return 0, err
 		}
+		usedTokens = used
 		tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
 		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf)
 		err = m.LongTermMemory.handler.ClearShortTerm(m.profile)
 		if err != nil {
-			return err
+			return 0, err
 		}
 		err = m.LongTermMemory.handler.TrimLongTermToStorageSize(m.profile, m.LongTermMemoryStorageSize)
 		if err != nil {
-			return err
+			return 0, err
 		}
 
 	}
 	chunks, err := m.LongTermMemory.handler.GetLongTerm(m.profile)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	m.LongTermMemory.buildIDF(chunks)
-	return nil
+	return usedTokens, nil
 }
 
 func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {

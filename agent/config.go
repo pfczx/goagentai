@@ -23,6 +23,7 @@ type Config struct {
 	LongTermMemorySummarizationProvider         string  `yaml:"long_term_memory_summarization_provider"`
 	LongTermMemorySummarizationInternalProvider string  `yaml:"long_term_memory_summarization_internal_provider"`
 	LongTermMemorySummarizationModel            string  `yaml:"long_term_memory_summarization_model"`
+	TokenBalanceLimit                           int     `yaml:"token_balance_limit"`
 }
 
 func DefaultConfig(name string, path string) *Config {
@@ -43,6 +44,7 @@ func DefaultConfig(name string, path string) *Config {
 		LongTermMemorySummarizationProvider: "HuggingFace",
 		LongTermMemorySummarizationInternalProvider: "nscale",
 		LongTermMemorySummarizationModel:            "Qwen/Qwen3-4B-Instruct-2507",
+		TokenBalanceLimit:                           1000000,
 	}
 }
 
@@ -78,6 +80,7 @@ var yamlComments = map[string]string{
 	"long_term_memory_summarization_internal_provider:": "  Internal provider for summarizing",
 
 	"long_term_memory_summarization_model:": "  Model for summarizing",
+	"token_balance_limit:":                  " Token usage for profile, if reached waring will be printed",
 }
 
 func addYAMLComments(data []byte) []byte {

@@ -93,7 +93,7 @@ func GetCommands() map[string]CliCommand {
 		"remove": {
 			Name:     "remove",
 			Alias:    "r",
-			Desc:     "Removes specified thing in firts argument \n\nfirst arguments -> \n\nprofile : p [profile_name]\n\nhistory : h [history_type] (long-term : lt or short-term : st) ",
+			Desc:     "Removes specified thing in firts argument \n\nfirst arguments -> \n\nprofile : p [profile_name]\n\nhistory : h [history_type] (long-term : lt or short-term : st) \n\n used-tokens : ut (set used tokens to 0)",
 			Callback: agent.Remove,
 		},
 	}

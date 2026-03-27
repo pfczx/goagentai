@@ -63,7 +63,7 @@ func LoadEnv() error {
 	return nil
 }
 
-func PrintState(profileName string, provider string, iternalProvider string, model string) {
+func PrintState(profileName string, provider string, iternalProvider string, model string, tokenStatus string) {
 	agent := color.New(color.FgCyan).Sprint("GoAgent")
 	profile := color.New(color.FgCyan).Sprint(profileName)
 	provider = color.New(color.FgGreen).Sprint(provider)
@@ -71,6 +71,6 @@ func PrintState(profileName string, provider string, iternalProvider string, mod
 	model = color.New(color.FgBlue).Sprint(model)
 	prompt := fmt.Sprint("$")
 
-	fmt.Printf("%s@%s (%s::%s::%s) \n", agent, profile, provider, iternalProvider, model)
+	fmt.Printf("%s@%s (%s::%s::%s) %s\n", agent, profile, provider, iternalProvider, model, tokenStatus)
 	fmt.Printf("%s ", prompt)
 }

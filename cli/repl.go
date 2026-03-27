@@ -16,6 +16,7 @@ func Repl(agent *agent.Agent) error {
 			agent.Profile.Config.Provider,
 			agent.Profile.Config.IternalProvider,
 			agent.Profile.Config.Model,
+			agent.TokenMenager.Status(),
 		)
 		if sc.Scan() {
 			text := strings.TrimSpace(sc.Text())

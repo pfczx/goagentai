@@ -3,14 +3,14 @@ package agent
 import (
 	"bufio"
 	"fmt"
+	"github.com/charmbracelet/glamour"
+	"github.com/pfczx/goagentai/memory"
+	"github.com/pfczx/goagentai/token"
+	"github.com/pfczx/goagentai/workspace"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/charmbracelet/glamour"
-	"github.com/pfczx/goagentai/memory"
-	"github.com/pfczx/goagentai/workspace"
 )
 
 func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) {
@@ -36,6 +36,14 @@ func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) 
 
 }
 
+func InitTokenMenager(config *Config) (*token.TokenMenager, error) {
+	tm, err := token.InitTokenMenager(config.Path, config.TokenBalanceLimit)
+	if err != nil {
+		return nil, err
+	}
+	return tm, nil
+}
+
 func InitAgent(profileName string) (*Agent, error) {
 	path, err := os.UserHomeDir()
 	if err != nil {
@@ -55,8 +63,12 @@ func InitAgent(profileName string) (*Agent, error) {
 		return nil, err
 	}
 	WorkspaceMenager := workspace.NewWorkspaceMenager()
+	TokenMenager, err := InitTokenMenager(config)
+	if err != nil {
+		return nil, err
+	}
 
-	return NewAgent(profile, Memorymenager, WorkspaceMenager), nil
+	return NewAgent(profile, Memorymenager, WorkspaceMenager, TokenMenager), nil
 
 }
 
@@ -95,6 +107,7 @@ func RunAsk(agent *Agent, args ...string) error {
 		return err
 	}
 	fmt.Print(out)
+	usedTokens := 0
 	if resp.Usage != nil {
 		fmt.Printf("Tokens prompt: %v completion: %v total: %v \n",
 			resp.Usage.PromptTokens,
@@ -120,14 +133,18 @@ func RunAsk(agent *Agent, args ...string) error {
 				agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
 
 			}
-			if err = agent.MemoryMenager.UpdateLongTerm(); err != nil {
+			usedSummarizationTokens, err := agent.MemoryMenager.UpdateLongTerm()
+			if err != nil {
 				return err
 			}
+			usedTokens += usedSummarizationTokens
 		}
 
 	} else {
 		fmt.Println("no token usage error : RunAsk")
 	}
+	usedTokens += resp.Usage.TotalTokens
+	agent.TokenMenager.AddUsage(usedTokens)
 
 	return nil
 }

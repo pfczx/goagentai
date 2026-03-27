@@ -1,6 +1,8 @@
 package agent
 
 import (
+	"github.com/pfczx/goagentai/token"
+
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
@@ -11,13 +13,15 @@ type Agent struct {
 	Profile         *Profile
 	MemoryMenager   *memory.MemoryMenager
 	WorspaceMenager *workspace.WorkspaceMenager
+	TokenMenager    *token.TokenMenager
 }
 
-func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager, workspaceMenager *workspace.WorkspaceMenager) *Agent {
+func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager, workspaceMenager *workspace.WorkspaceMenager, tokenMenager *token.TokenMenager) *Agent {
 	return &Agent{
 		Profile:         profile,
 		MemoryMenager:   memoryMenager,
 		WorspaceMenager: workspaceMenager,
+		TokenMenager:    tokenMenager,
 	}
 }
 
