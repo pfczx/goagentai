@@ -69,7 +69,7 @@ func GetCommands() map[string]CliCommand {
 		"switch": {
 			Name:     "switch",
 			Alias:    "s",
-			Desc:     "Switching setting provided in first argument \n\nswitch [thing to swith] [name of new thing or alias] \n\nfirst arguments ->  profile : p,internal-provider : ip,provider : pv,model : m",
+			Desc:     "Switching setting provided in first argument \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  \n\nprofile : p \n\ninternal-provider : ip \n\nprovider : pv \n\nmodel : m",
 			Callback: agent.Switch,
 		},
 		"list": {
@@ -87,7 +87,7 @@ func GetCommands() map[string]CliCommand {
 		"workspace": {
 			Name:     "workspace",
 			Alias:    "w",
-			Desc:     "Execute workspace command provided in first argumet \n\nfirst arguments -> \n\ndd : a [filepath or directory] -p (p flag for persistent adding, without flag all content of workspace is erased after next ask)\n\nremove : r [filepath or directory] or all (clearing all workspace content) \n\nlist : l (listing all workspace content) all flag for listing with content",
+			Desc:     "Execute workspace command provided in first argumet \n\nfirst arguments -> \n\nadd : a [filepath or directory] -p (p flag for persistent adding, without flag all content of workspace is erased after next ask)\n\nremove : r [filepath or directory] or all (clearing all workspace content) \n\nlist : l (listing all workspace paths) all flag for listing with content",
 			Callback: agent.Workspace,
 		},
 		"remove": {
