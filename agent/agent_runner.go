@@ -62,7 +62,31 @@ func InitAgent(profileName string) (*Agent, error) {
 
 func RunAsk(agent *Agent, args ...string) error {
 	prompt := strings.Join(args, " ")
-	resp, err := agent.Ask(prompt)
+	var context []string
+	//clearing workspace entries set to addOnce
+	workspaceString := agent.WorspaceMenager.WorkspaceToString(true)
+	if workspaceString != "" {
+		context = append(context, workspaceString)
+	}
+
+	if agent.MemoryMenager.MemoryOn {
+		//last n conversations
+		shortTermString := agent.MemoryMenager.ShortTermToString()
+		//prompt + short term used for searching relevant long term chunks
+		longTermString, err := agent.MemoryMenager.GetLongTermContextString(fmt.Sprintf("%s %s", prompt, shortTermString))
+		if err != nil {
+			return err
+		}
+
+		if shortTermString != "" {
+			context = append(context, shortTermString)
+		}
+		if longTermString != "" {
+			context = append(context, longTermString)
+		}
+
+	}
+	resp, err := agent.Ask(prompt, context)
 	if err != nil {
 		return err
 	}
@@ -88,7 +112,14 @@ func RunAsk(agent *Agent, args ...string) error {
 					}
 				}
 			}
-			agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
+			//appending workspace string to prompt for more relevant summarization results
+			if workspaceString != "" {
+				agent.MemoryMenager.AppendShortTermHistory(prompt+" "+workspaceString, resp.Text, usefull)
+
+			} else {
+				agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
+
+			}
 			if err = agent.MemoryMenager.UpdateLongTerm(); err != nil {
 				return err
 			}

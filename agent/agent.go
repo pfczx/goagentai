@@ -1,8 +1,6 @@
 package agent
 
 import (
-	"fmt"
-
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
@@ -23,31 +21,7 @@ func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager, workspaceMe
 	}
 }
 
-func (a *Agent) Ask(input string) (*llm.ChatResponse, error) {
-	var context []string
-	if a.MemoryMenager.MemoryOn {
-		//clearing workspace entries set to addOnce
-		workspaceString := a.WorspaceMenager.WorkspaceToString(true)
-		//last n conversations
-		shortTermString := a.MemoryMenager.ShortTermToString()
-		//prompt + short term used for searching relevant long term chunks
-		longTermString, err := a.MemoryMenager.GetLongTermContextString(fmt.Sprintf("%s %s", input, shortTermString))
-
-		if err != nil {
-			return nil, err
-
-		}
-		if workspaceString != "" {
-			context = append(context, workspaceString)
-		}
-		if shortTermString != "" {
-			context = append(context, shortTermString)
-		}
-		if longTermString != "" {
-			context = append(context, longTermString)
-		}
-
-	}
+func (a *Agent) Ask(input string, context []string) (*llm.ChatResponse, error) {
 	message, err := prompt.BuildAsk(input, context)
 	if err != nil {
 		return nil, err
