@@ -7,51 +7,52 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
-type HuggingFace struct {
+type Vercel struct {
 	ApiKey           string
 	InternalProvider string
 	Model            string
 }
 
-func NewHuggingFace(model string, iternalProvider string) (*HuggingFace, error) {
-	key := os.Getenv("HUGGING_FACE")
-	provider := &HuggingFace{
+func NewVercel(model string, iternalProvider string) (*Vercel, error) {
+	key := os.Getenv("VERCEL")
+	provider := &Vercel{
 		ApiKey:           key,
 		InternalProvider: iternalProvider,
 		Model:            model,
 	}
 	if key == "" {
-		fmt.Println("There is no key in .env file (HuggingFace), add your key to .env file in .config/goagent and restart or switch provider")
+		fmt.Println("There is no key in .env file (Vercel), add your key to .env file in .config/goagent and restart or switch provider")
 		return provider, nil
 	}
 	return provider, nil
 }
 
-func (h *HuggingFace) Name() string {
-	return "HuggingFace"
+func (v *Vercel) Name() string {
+	return "Vercel"
 }
 
-func (h *HuggingFace) IternalProviderName() string {
-	return h.InternalProvider
+func (v *Vercel) IternalProviderName() string {
+	return v.InternalProvider
 }
 
-func (h *HuggingFace) ModelName() string {
-	return h.Model
+func (v *Vercel) ModelName() string {
+	return v.Model
 }
-func (h *HuggingFace) SwitchModel(model string) error {
-	h.Model = model
+func (v *Vercel) SwitchModel(model string) error {
+	v.Model = model
 	return nil
 }
 
-func (h *HuggingFace) SwitchIternalProvider(provider string) error {
-	h.InternalProvider = provider
+func (v *Vercel) SwitchIternalProvider(provider string) error {
+	v.InternalProvider = provider
 	return nil
 }
 
-func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
-	endpoint := "https://router.huggingface.co/v1/chat/completions"
+func (v *Vercel) Generate(message ChatMessage) (*ChatResponse, error) {
+	endpoint := "https://ai-gateway.vercel.sh/v1/chat/completions"
 
 	//building reques from ChatMessage struct
 	var contentParts []map[string]interface{}
@@ -88,7 +89,7 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 	})
 
 	// Final payload
-	modelString := h.Model + ":" + h.InternalProvider
+	modelString := v.InternalProvider + "/" + v.Model
 	payload := map[string]interface{}{
 		"model":    modelString,
 		"stream":   false,
@@ -105,7 +106,7 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+h.ApiKey)
+	req.Header.Set("Authorization", "Bearer "+v.ApiKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -161,55 +162,81 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 	}, nil
 }
 
-func (h *HuggingFace) ListIternalProviders() ([]string, error) {
-	//there is no api endpoint for iternal providers
-	//manual created list of providers with llm models
-	list := []string{
-		"cerebras",
-		"cohere",
-		"featherless-ai",
-		"fireworks-ai",
-		"groq",
-		"hyperbolic",
-		"novita",
-		"nscale",
-		"ovhcloud",
-		"publicai",
-		"sambanova",
-		"scaleway",
-		"together",
-		"zai-org",
-	}
-	return list, nil
-}
-
-func (h *HuggingFace) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
-	url := "https://huggingface.co/api/models?inference_provider=" + provider
-	if withPhoto {
-		url = url + "&pipeline_tag=image-text-to-text"
-	} else {
-		url = url + "&pipeline_tag=text-generation"
+func (v *Vercel) ListIternalProviders() ([]string, error) {
+	req, err := http.NewRequest("GET", "https://ai-gateway.vercel.sh/v1/models", nil)
+	if err != nil {
+		return nil, err
 	}
 
-	resp, err := http.Get(url)
+	req.Header.Set("Authorization", "Bearer "+v.ApiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	type model struct {
-		Id string `json:"id"`
-	}
-	var models []model
 
-	err = json.NewDecoder(resp.Body).Decode(&models)
+	var raw struct {
+		Data []struct {
+			OwnedBy string `json:"owned_by"`
+		} `json:"data"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+		return nil, err
+	}
+
+	set := make(map[string]struct{})
+
+	for _, m := range raw.Data {
+		if m.OwnedBy != "" {
+			set[m.OwnedBy] = struct{}{}
+		}
+	}
+
+	var providers []string
+	for p := range set {
+		providers = append(providers, p)
+	}
+
+	return providers, nil
+}
+
+func (v *Vercel) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
+	req, err := http.NewRequest("GET", "https://ai-gateway.vercel.sh/v1/models", nil)
 	if err != nil {
 		return nil, err
 	}
-	var modelsList []string
-	for _, model := range models {
-		modelsList = append(modelsList, model.Id)
+
+	req.Header.Set("Authorization", "Bearer "+v.ApiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var raw struct {
+		Data []struct {
+			ID      string `json:"id"`
+			OwnedBy string `json:"owned_by"`
+		} `json:"data"`
 	}
 
-	return modelsList, nil
+	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
+		return nil, err
+	}
 
+	var models []string
+
+	for _, m := range raw.Data {
+		if m.OwnedBy == provider {
+			fullName := strings.Split(m.ID, "/")
+			models = append(models, fullName[1])
+		}
+	}
+
+	return models, nil
 }

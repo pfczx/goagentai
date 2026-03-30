@@ -150,7 +150,7 @@ func FirstInitialize() error {
 		content := `
 HUGGING_FACE=
 
-GROK=
+VERCEL=
 
 OPENROUTER=
 `

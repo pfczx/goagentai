@@ -142,10 +142,12 @@ func RunAsk(agent *Agent, args ...string) error {
 
 	} else {
 		fmt.Println("no token usage error : RunAsk")
+		fmt.Println("Raw response: " + resp.Text)
 	}
 	usedTokens += resp.Usage.TotalTokens
-	agent.TokenMenager.AddUsage(usedTokens)
-
+	if usedTokens > 0 {
+		agent.TokenMenager.AddUsage(usedTokens)
+	}
 	return nil
 }
 
