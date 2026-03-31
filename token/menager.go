@@ -4,13 +4,17 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
+
 type TokenMenager struct {
+	mu sync.Mutex
 	path              string
 	tokenBalanceLimit int
 	tokenBalanceUsed  int
 }
+
 
 func InitTokenMenager(path string, balanceLimit int) (*TokenMenager, error) {
 	tm := &TokenMenager{

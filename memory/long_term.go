@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/pfczx/goagentai/prompt"
+	"github.com/pfczx/goagentai/token"
 )
 
 type LongTermMemory struct {
@@ -120,36 +121,54 @@ func (m *MemoryMenager) Summarize() (string, int, error) {
 
 }
 
-func (m *MemoryMenager) UpdateLongTerm() (int, error) {
+func (m *MemoryMenager) UpdateLongTerm(tokenMenager *token.TokenMenager) error {
 	t, err := m.TriggerSummarization()
 	if err != nil {
-		return 0, err
+		return err
 	}
-	usedTokens := 0
 	if t {
-		summarization, used, err := m.Summarize()
-		if err != nil {
-			return 0, err
-		}
-		usedTokens = used
-		tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
-		m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf)
-		err = m.LongTermMemory.handler.ClearShortTerm(m.profile)
-		if err != nil {
-			return 0, err
-		}
-		err = m.LongTermMemory.handler.TrimLongTermToStorageSize(m.profile, m.LongTermMemoryStorageSize)
-		if err != nil {
-			return 0, err
-		}
+		fmt.Println("Summarizing memory in background...")
+		go func() {
+			defer func() {
+				if r := recover(); r != nil {
+					fmt.Println("panic in summary:", r)
+				}
+			}()
 
+			summarization, used, err := m.Summarize()
+			if err != nil {
+				fmt.Println("summary error:", err)
+				return
+			}
+
+			tf := m.LongTermMemory.analyzer.ComputeTF(summarization)
+
+			m.LongTermMemory.handler.SaveLongTerm(m.profile, summarization, tf)
+
+			if err := m.LongTermMemory.handler.ClearShortTerm(m.profile); err != nil {
+				fmt.Println("clear short term error:", err)
+				return
+			}
+
+			if err := m.LongTermMemory.handler.TrimLongTermToStorageSize(
+				m.profile,
+				m.LongTermMemoryStorageSize,
+			); err != nil {
+				fmt.Println("trim long term error:", err)
+				return
+			}
+			chunks, err := m.LongTermMemory.handler.GetLongTerm(m.profile)
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+			m.LongTermMemory.buildIDF(chunks)
+			if used > 0 && tokenMenager != nil {
+				tokenMenager.AddUsage(used)
+			}
+		}()
 	}
-	chunks, err := m.LongTermMemory.handler.GetLongTerm(m.profile)
-	if err != nil {
-		return 0, err
-	}
-	m.LongTermMemory.buildIDF(chunks)
-	return usedTokens, nil
+	return nil
 }
 
 func (m *MemoryMenager) GetLongTermContextString(input string) (string, error) {

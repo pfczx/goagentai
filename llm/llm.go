@@ -43,8 +43,10 @@ func NewProvider(name string, model string, iternalProvider string) (ModelProvid
 	switch name {
 	case "HuggingFace":
 		return NewHuggingFace(model, iternalProvider)
-	case "Vercel":
-		return NewVercel(model, iternalProvider)
+	case "OpenRouter":
+		return NewOpenRouter(model, iternalProvider)
+	case "Groq":
+		return NewGroq(model, iternalProvider)
 	default:
 		return nil, fmt.Errorf("unknown provider %s", name)
 	}
@@ -54,8 +56,8 @@ func ListProviders() []string {
 	//currently avaible providers
 	providers := []string{
 		"HuggingFace",
-		"Vercel",
 		"OpenRouter",
+		"Groq",
 	}
 	return providers
 }

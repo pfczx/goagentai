@@ -3,14 +3,17 @@ package agent
 import (
 	"bufio"
 	"fmt"
-	"github.com/charmbracelet/glamour"
-	"github.com/pfczx/goagentai/memory"
-	"github.com/pfczx/goagentai/token"
-	"github.com/pfczx/goagentai/workspace"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
+
+	"github.com/briandowns/spinner"
+	"github.com/charmbracelet/glamour"
+	"github.com/pfczx/goagentai/memory"
+	"github.com/pfczx/goagentai/token"
+	"github.com/pfczx/goagentai/workspace"
 )
 
 func InitMemoryMenagerFromConfig(config *Config) (*memory.MemoryMenager, error) {
@@ -98,22 +101,25 @@ func RunAsk(agent *Agent, args ...string) error {
 		}
 
 	}
+	s := spinner.New(spinner.CharSets[78], 1000*time.Microsecond)
+	s.Suffix = "Generating Response..."
+	s.Start()
 	resp, err := agent.Ask(prompt, context)
 	if err != nil {
 		return err
 	}
+	s.Stop()
 	out, err := glamour.Render(resp.Text, "auto")
 	if err != nil {
 		return err
 	}
 	fmt.Print(out)
-	usedTokens := 0
 	if resp.Usage != nil {
 		fmt.Printf("Tokens prompt: %v completion: %v total: %v \n",
 			resp.Usage.PromptTokens,
 			resp.Usage.CompletionTokens,
 			resp.Usage.TotalTokens)
-		if agent.MemoryMenager.MemoryOn {
+		if agent.MemoryMenager.MemoryOn && resp.Usage.TotalTokens > 0 {
 			usefull := false
 			if agent.MemoryMenager.ShortTermMemoryEvaluation {
 				sc := bufio.NewScanner(os.Stdin)
@@ -133,20 +139,18 @@ func RunAsk(agent *Agent, args ...string) error {
 				agent.MemoryMenager.AppendShortTermHistory(prompt, resp.Text, usefull)
 
 			}
-			usedSummarizationTokens, err := agent.MemoryMenager.UpdateLongTerm()
+			err := agent.MemoryMenager.UpdateLongTerm(agent.TokenMenager)
 			if err != nil {
 				return err
 			}
-			usedTokens += usedSummarizationTokens
 		}
 
 	} else {
 		fmt.Println("no token usage error : RunAsk")
 		fmt.Println("Raw response: " + resp.Text)
 	}
-	usedTokens += resp.Usage.TotalTokens
-	if usedTokens > 0 {
-		agent.TokenMenager.AddUsage(usedTokens)
+	if resp.Usage.TotalTokens > 0 {
+		agent.TokenMenager.AddUsage(resp.Usage.TotalTokens)
 	}
 	return nil
 }

@@ -150,9 +150,9 @@ func FirstInitialize() error {
 		content := `
 HUGGING_FACE=
 
-VERCEL=
+GROQ=
 
-OPENROUTER=
+OPEN_ROUTER=
 `
 		err = os.WriteFile(envPath, []byte(content), 0644)
 		if err != nil {

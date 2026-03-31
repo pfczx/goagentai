@@ -3,11 +3,17 @@ package token
 import "fmt"
 
 func (t *TokenMenager) AddUsage(tokens int) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
 	t.tokenBalanceUsed += tokens
 	return t.SaveUsage()
 }
 
 func (t *TokenMenager) Status() string {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
 	if t.tokenBalanceLimit == 0 {
 		return fmt.Sprintf("%d / ∞", t.tokenBalanceUsed)
 	}
@@ -23,6 +29,9 @@ func (t *TokenMenager) Status() string {
 }
 
 func (t *TokenMenager) ResetUsage() error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
 	t.tokenBalanceUsed = 0
 	return t.SaveUsage()
 }

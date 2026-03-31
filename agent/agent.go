@@ -1,11 +1,12 @@
 package agent
 
 import (
-	"github.com/pfczx/goagentai/token"
+
 
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
+	"github.com/pfczx/goagentai/token"
 	"github.com/pfczx/goagentai/workspace"
 )
 
@@ -30,6 +31,7 @@ func (a *Agent) Ask(input string, context []string) (*llm.ChatResponse, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	llmResponse, err := a.Profile.Provider.Generate(message)
 	if err != nil {
 		return nil, err
