@@ -31,11 +31,11 @@ func Help() error {
 	builder.WriteString("## Available Commands\n\n")
 
 	for _, cmd := range commands {
-		builder.WriteString(fmt.Sprintf("### `%s`\n\n", cmd.Name))
-		builder.WriteString("Alias: " + cmd.Alias)
-		builder.WriteString("\n\n")
+		builder.WriteString(fmt.Sprintf("### `%s`  ", cmd.Name))
+		builder.WriteString("alias: " + cmd.Alias)
+		builder.WriteString("\n")
 		builder.WriteString(cmd.Desc)
-		builder.WriteString("\n\n")
+		builder.WriteString("\n")
 	}
 
 	out, err := glamour.Render(builder.String(), "auto")

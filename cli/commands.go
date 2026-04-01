@@ -63,7 +63,7 @@ func GetCommands() map[string]CliCommand {
 		"ask": {
 			Name:     "ask",
 			Alias:    "a",
-			Desc:     "Ask llm question provided in first argument",
+			Desc:     "Ask [flag] [prompt] (spaces works in prompt) llm question provided in first argument -s flag for adding screenshot with github.com/kbinani/screenshot",
 			Callback: agent.RunAsk,
 		},
 		"switch": {
@@ -75,7 +75,7 @@ func GetCommands() map[string]CliCommand {
 		"list": {
 			Name:     "list",
 			Alias:    "l",
-			Desc:     "Print list of selected things \n\nlist [thing to list or alias] \n\nfirst arguments -> \n\nprofiles : p \n\nproviders : pv \n\nintenral-providers : ip \n\nmodels  : m --image flag for listing models accepting photo input",
+			Desc:     "Print list of selected things \n\nlist [thing to list or alias] \n\nfirst arguments -> \n\nprofiles : p \n\nproviders : pv \n\nintenral-providers : ip \n\nmodels  : m -img flag for listing models accepting photo input(only works for HuggingFace, for other providers you need to visit their website )",
 			Callback: agent.List,
 		},
 		"config": {

@@ -69,7 +69,7 @@ func List(agent *Agent, args ...string) error {
 		fmt.Print(out)
 	case "models", "m":
 		withPhoto := false
-		if len(args) > 1 && args[1] == "--image" {
+		if len(args) > 1 && args[1] == "-img" {
 			withPhoto = true
 		}
 		list, err := agent.Profile.Provider.ListProviderModels(agent.Profile.Provider.IternalProviderName(), withPhoto)

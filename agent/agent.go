@@ -2,7 +2,6 @@ package agent
 
 import (
 
-
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
@@ -26,8 +25,8 @@ func NewAgent(profile *Profile, memoryMenager *memory.MemoryMenager, workspaceMe
 	}
 }
 
-func (a *Agent) Ask(input string, context []string) (*llm.ChatResponse, error) {
-	message, err := prompt.BuildAsk(input, context)
+func (a *Agent) Ask(input string, context []string, triggerScreenshot bool) (*llm.ChatResponse, error) {
+	message, err := prompt.BuildAsk(input, context, triggerScreenshot)
 	if err != nil {
 		return nil, err
 	}

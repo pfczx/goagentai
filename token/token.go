@@ -7,6 +7,9 @@ func (t *TokenMenager) AddUsage(tokens int) error {
 	defer t.mu.Unlock()
 
 	t.tokenBalanceUsed += tokens
+	if t.tokenBalanceUsed >= t.tokenBalanceLimit {
+		fmt.Println("Token balance limit reached!!!")
+	}
 	return t.SaveUsage()
 }
 

@@ -12,7 +12,6 @@ type Config struct {
 	Provider                                    string  `yaml:"provider"`
 	IternalProvider                             string  `yaml:"iternalprovider"`
 	Model                                       string  `yaml:"model"`
-	Temperature                                 float64 `yaml:"temperature"`
 	MemoryOn                                    bool    `yaml:"memory_on"`
 	ShortTermMemoryLimit                        int     `yaml:"short_term_memory_limit"`
 	ShortTermMemoryEvaluation                   bool    `yaml:"short_term_memory_evaluation_on"`
@@ -30,11 +29,10 @@ func DefaultConfig(name string, path string) *Config {
 	return &Config{
 		Name:                                name,
 		Path:                                path,
-		Provider:                            "HuggingFace",
-		IternalProvider:                     "nscale",
-		Model:                               "Qwen/Qwen3-4B-Instruct-2507",
-		Temperature:                         50.0,
-		MemoryOn:                            true,
+		Provider:                            "Groq",
+		IternalProvider:                     "groq",
+		Model:                               "openai/gpt-oss-20b",
+		MemoryOn:                            false,
 		ShortTermMemoryLimit:                1,
 		ShortTermMemoryEvaluation:           true,
 		LongTermMemoryChunksToAdd:           5,
@@ -53,13 +51,11 @@ var yamlComments = map[string]string{
 
 	"path:": " Path to profile directory \n Do not touch",
 
-	"provider:": "  LLM Provider - service that provide models and resources \n Add key in .env file in .config/goagent \n Choose from: \n 1. HuggingFace \n 2. Groq \n OpenRouter",
+	"provider:": "  LLM Provider - service that provide models and resources \n Add key in .env file in .config/goagent \n Choose from: \n 1. HuggingFace \n 2. Groq \n 3. OpenRouter",
 
 	"iternalprovider:": "  Some providers like HuggingFace have internal providers \n Check avaible with list internal-providers",
 
 	"model:": "  Model for generating answers \n Check avaible with list models",
-
-	"temperature:": "  Model tendency to output less predictible answers \n Temp: 100 - very high random answers \n Temp: 0 - very predictible answears",
 
 	"memory_on:": "  Memory System switch \n Set `false` when necessary, responses quality will drop but much more less input tokens will be used",
 

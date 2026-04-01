@@ -52,7 +52,7 @@ func InitAgent(profileName string) (*Agent, error) {
 	if err != nil {
 		return nil, err
 	}
-	path = filepath.Join(path, ".config", "goagent", "profiles", profileName, "config")
+	path = filepath.Join(path, ".config", "goagent", "profiles", profileName, "config.yaml")
 	config, err := LoadConfig(path)
 	if err != nil {
 		return nil, err
@@ -76,14 +76,22 @@ func InitAgent(profileName string) (*Agent, error) {
 }
 
 func RunAsk(agent *Agent, args ...string) error {
-	prompt := strings.Join(args, " ")
+	triggerScreenshot := false
+	promptParts := args
+
+	if len(args) > 0 && args[0] == "-s" {
+		triggerScreenshot = true
+		promptParts = args[1:]
+	}
+
+	prompt := strings.Join(promptParts, " ")
+
 	var context []string
 	//clearing workspace entries set to addOnce
 	workspaceString := agent.WorspaceMenager.WorkspaceToString(true)
 	if workspaceString != "" {
 		context = append(context, workspaceString)
 	}
-
 	if agent.MemoryMenager.MemoryOn {
 		//last n conversations
 		shortTermString := agent.MemoryMenager.ShortTermToString()
@@ -101,10 +109,10 @@ func RunAsk(agent *Agent, args ...string) error {
 		}
 
 	}
-	s := spinner.New(spinner.CharSets[78], 1000*time.Microsecond)
+	s := spinner.New(spinner.CharSets[78], 100*time.Millisecond)
 	s.Suffix = "Generating Response..."
 	s.Start()
-	resp, err := agent.Ask(prompt, context)
+	resp, err := agent.Ask(prompt, context, triggerScreenshot)
 	if err != nil {
 		return err
 	}
@@ -156,7 +164,7 @@ func RunAsk(agent *Agent, args ...string) error {
 }
 
 func EditConfig(agent *Agent, args ...string) error {
-	configPath := filepath.Join(agent.Profile.Path, "config")
+	configPath := filepath.Join(agent.Profile.Path, "config.yaml")
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
 		editor = "nano"

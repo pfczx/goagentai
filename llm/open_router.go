@@ -68,7 +68,7 @@ func (o *Openrouter) Generate(message ChatMessage) (*ChatResponse, error) {
 			contentParts = append(contentParts, map[string]interface{}{
 				"type": "image_url",
 				"image_url": map[string]interface{}{
-					"url": part.ImageURL,
+					"url": part.ImageURL.Url,
 				},
 			})
 		}
@@ -196,6 +196,9 @@ func (v *Openrouter) ListIternalProviders() ([]string, error) {
 }
 
 func (o *Openrouter) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
+	if withPhoto{
+		fmt.Println("OpenRouter does not support multimodal filter")
+	}
 	req, err := http.NewRequest("GET", "https://openrouter.ai/api/v1/models/user", nil)
 	if err != nil {
 		return nil, err

@@ -17,13 +17,13 @@ type Profile struct {
 	Temperature float64
 }
 
-func NewProfile(name string, path string, config *Config, provider llm.ModelProvider, temperature float64) *Profile {
+func NewProfile(name string, path string, config *Config, provider llm.ModelProvider) *Profile {
 	return &Profile{
 		Name:        name,
 		Path:        path,
 		Config:      config,
 		Provider:    provider,
-		Temperature: temperature,
+
 	}
 }
 
@@ -60,7 +60,7 @@ func (c *Config) ProfileFromConfig() (*Profile, error) {
 		return nil, err
 	}
 	return NewProfile(
-		c.Name, c.Path, c, provider, c.Temperature,
+		c.Name, c.Path, c, provider,
 	), nil
 }
 
@@ -71,7 +71,6 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 		Provider:                            p.Provider.Name(),
 		IternalProvider:                     p.Provider.IternalProviderName(),
 		Model:                               p.Provider.ModelName(),
-		Temperature:                         p.Temperature,
 		MemoryOn:                            m.MemoryOn,
 		ShortTermMemoryLimit:                m.ShortTermMemoryLimit,
 		ShortTermMemoryEvaluation:           m.ShortTermMemoryEvaluation,
@@ -84,7 +83,7 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 		LongTermMemorySummarizationModel:            m.LongTermMemorySummarizationProvider.ModelName(),
 	}
 	p.Config = config
-	err := SaveConfig(filepath.Join(p.Path, "config"), config)
+	err := SaveConfig(filepath.Join(p.Path, "config.yaml"), config)
 	if err != nil {
 		return err
 	}
@@ -105,7 +104,7 @@ func InitProfile(args ...string) error {
 			return err
 		}
 	}
-	configPath := filepath.Join(path, "config")
+	configPath := filepath.Join(path, "config.yaml")
 
 	if _, err = os.Stat(configPath); os.IsNotExist(err) {
 		if err := SaveConfig(configPath, DefaultConfig(args[0], path)); err != nil {

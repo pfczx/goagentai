@@ -13,7 +13,11 @@ type ChatMessage struct {
 type ContentPart struct {
 	Type     string `json:"type"`
 	Text     string `json:"text,omitempty"`
-	ImageURL string `json:"image_url,omitempty"`
+	ImageURL *Img   `json:"image_url,omitempty"`
+}
+
+type Img struct {
+	Url string `json:"url"`
 }
 
 // output inlude md sring response, in future forced json with action like docker ps

@@ -67,7 +67,7 @@ func (g *Groq) Generate(message ChatMessage) (*ChatResponse, error) {
 			contentParts = append(contentParts, map[string]interface{}{
 				"type": "image_url",
 				"image_url": map[string]interface{}{
-					"url": part.ImageURL,
+					"url": part.ImageURL.Url,
 				},
 			})
 		}
@@ -169,6 +169,9 @@ func (g *Groq) ListIternalProviders() ([]string, error) {
 }
 
 func (g *Groq) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
+	if withPhoto{
+		fmt.Println("Groq does not support multimodal filter")
+	}
 	req, err := http.NewRequest("GET", "https://api.groq.com/openai/v1/models", nil)
 	if err != nil {
 		return nil, err

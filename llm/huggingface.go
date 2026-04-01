@@ -67,7 +67,7 @@ func (h *HuggingFace) Generate(message ChatMessage) (*ChatResponse, error) {
 			contentParts = append(contentParts, map[string]interface{}{
 				"type": "image_url",
 				"image_url": map[string]interface{}{
-					"url": part.ImageURL,
+					"url": part.ImageURL.Url,
 				},
 			})
 		}
