@@ -110,7 +110,7 @@ func RunAsk(agent *Agent, args ...string) error {
 
 	}
 	s := spinner.New(spinner.CharSets[78], 100*time.Millisecond)
-	s.Suffix = "Generating Response..."
+	s.Suffix = " Generating Response..."
 	s.Start()
 	resp, err := agent.Ask(prompt, context, triggerScreenshot)
 	if err != nil {

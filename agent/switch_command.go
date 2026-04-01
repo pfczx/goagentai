@@ -2,9 +2,15 @@ package agent
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/pfczx/goagentai/llm"
 )
+
+func isNumber(s string) bool {
+	_, err := strconv.Atoi(s)
+	return err == nil
+}
 
 func Switch(agent *Agent, args ...string) error {
 	switch args[0] {
@@ -25,9 +31,41 @@ func Switch(agent *Agent, args ...string) error {
 		}
 		agent.Profile.Provider = provider
 	case "internal-provider", "ip":
-		agent.Profile.Provider.SwitchIternalProvider(args[1])
+		if isNumber(args[1]) {
+			providers, err := agent.Profile.Provider.
+				ListIternalProviders()
+			if err != nil {
+				return fmt.Errorf("error fetching internal providers: %w",
+					err)
+			}
+
+			num, _ := strconv.Atoi(args[1])
+			if num < 1 || num > len(providers) {
+				return fmt.Errorf("internal provider number out of range  (1-%d)", len(providers))
+			}
+			agent.Profile.Provider.SwitchIternalProvider(providers[num-1])
+		} else {
+			agent.Profile.Provider.SwitchIternalProvider(args[1])
+		}
+
 	case "model", "m":
-		agent.Profile.Provider.SwitchModel(args[1])
+		if isNumber(args[1]) {
+			models, err := agent.Profile.Provider.ListProviderModels(
+				agent.Profile.Provider.IternalProviderName(), false)
+			if err != nil {
+				return fmt.Errorf("error fetching models: %w", err)
+			}
+
+			num, _ := strconv.Atoi(args[1])
+			if num < 1 || num > len(models) {
+				return fmt.Errorf("model number out of range (1-%d)",
+					len(models))
+			}
+			agent.Profile.Provider.SwitchModel(models[num-1])
+		} else {
+			agent.Profile.Provider.SwitchModel(args[1])
+		}
+
 	default:
 		return fmt.Errorf("First argument is not valid")
 	}

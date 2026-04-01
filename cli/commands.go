@@ -63,13 +63,13 @@ func GetCommands() map[string]CliCommand {
 		"ask": {
 			Name:     "ask",
 			Alias:    "a",
-			Desc:     "Ask [flag] [prompt] (spaces works in prompt) llm question provided in first argument -s flag for adding screenshot with github.com/kbinani/screenshot",
+			Desc:     "Ask [flag] [prompt] (spaces works in prompt) llm question provided in first argument -s flag for adding screenshot with github.com/kbinani/screenshot \n\nPhotos are converted to base64 format, it may be too big for low token limit api",
 			Callback: agent.RunAsk,
 		},
 		"switch": {
 			Name:     "switch",
 			Alias:    "s",
-			Desc:     "Switching setting provided in first argument \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  \n\nprofile : p \n\ninternal-provider : ip \n\nprovider : pv \n\nmodel : m",
+			Desc:     "Switching setting provided in first argument, instead of a name you can provide numbers from command list without flags \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  \n\nprofile : p \n\ninternal-provider : ip \n\nprovider : pv \n\nmodel : m",
 			Callback: agent.Switch,
 		},
 		"list": {

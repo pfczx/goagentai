@@ -57,8 +57,9 @@ func List(agent *Agent, args ...string) error {
 		}
 		builder.WriteString("# Currently availble iternal-providers for ")
 		builder.WriteString(agent.Profile.Provider.Name() + "\n\n")
-		for _, iternalProvider := range list {
+		for num, iternalProvider := range list {
 			builder.WriteString("## ")
+			builder.WriteString(fmt.Sprintf("%d ", num+1))
 			builder.WriteString(iternalProvider + "\n")
 		}
 		out, err := glamour.Render(builder.String(), "auto")
@@ -69,7 +70,7 @@ func List(agent *Agent, args ...string) error {
 		fmt.Print(out)
 	case "models", "m":
 		withPhoto := false
-		if len(args) > 1 && args[1] == "-img" {
+		if len(args) > 1 && args[1] == "--image" {
 			withPhoto = true
 		}
 		list, err := agent.Profile.Provider.ListProviderModels(agent.Profile.Provider.IternalProviderName(), withPhoto)
@@ -78,8 +79,9 @@ func List(agent *Agent, args ...string) error {
 		}
 		builder.WriteString("# Currently availble models for ")
 		builder.WriteString(agent.Profile.Provider.IternalProviderName() + "\n\n")
-		for _, model := range list {
+		for num, model := range list {
 			builder.WriteString("## ")
+			builder.WriteString(fmt.Sprintf("%d ", num+1))
 			builder.WriteString(model + "\n")
 		}
 		out, err := glamour.Render(builder.String(), "auto")

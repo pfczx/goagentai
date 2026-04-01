@@ -19,11 +19,10 @@ type Profile struct {
 
 func NewProfile(name string, path string, config *Config, provider llm.ModelProvider) *Profile {
 	return &Profile{
-		Name:        name,
-		Path:        path,
-		Config:      config,
-		Provider:    provider,
-
+		Name:     name,
+		Path:     path,
+		Config:   config,
+		Provider: provider,
 	}
 }
 
@@ -81,6 +80,7 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 		LongTermMemorySummarizationProvider: m.LongTermMemorySummarizationProvider.Name(),
 		LongTermMemorySummarizationInternalProvider: m.LongTermMemorySummarizationProvider.IternalProviderName(),
 		LongTermMemorySummarizationModel:            m.LongTermMemorySummarizationProvider.ModelName(),
+		TokenBalanceLimit:                           p.Config.TokenBalanceLimit,
 	}
 	p.Config = config
 	err := SaveConfig(filepath.Join(p.Path, "config.yaml"), config)

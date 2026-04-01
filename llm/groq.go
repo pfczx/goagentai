@@ -53,44 +53,34 @@ func (g *Groq) SwitchIternalProvider(provider string) error {
 func (g *Groq) Generate(message ChatMessage) (*ChatResponse, error) {
 	endpoint := "https://api.groq.com/openai/v1/chat/completions"
 
-	//building reques from ChatMessage struct
-	var contentParts []map[string]interface{}
+	// Spłaszczamy wszystko do jednego stringa
+	contentText := ""
+	if message.SystemPrompt != "" {
+		contentText += message.SystemPrompt + "\n"
+	}
 
 	for _, part := range message.Content {
 		switch part.Type {
 		case "text":
-			contentParts = append(contentParts, map[string]interface{}{
-				"type": part.Type,
-				"text": part.Text,
-			})
+			contentText += part.Text + "\n"
 		case "image_url":
-			contentParts = append(contentParts, map[string]interface{}{
-				"type": "image_url",
-				"image_url": map[string]interface{}{
-					"url": part.ImageURL.Url,
-				},
-			})
+			if part.ImageURL != nil {
+				contentText += "[image: " + part.ImageURL.Url + "]\n"
+			}
 		}
 	}
 
-	var messages []map[string]interface{}
-
-	if message.SystemPrompt != "" {
-		messages = append(messages, map[string]interface{}{
-			"role":    "system",
-			"content": message.SystemPrompt,
-		})
+	// Tworzymy wiadomości
+	messages := []map[string]interface{}{
+		{
+			"role":    "user",
+			"content": contentText, // <-- musi być string
+		},
 	}
 
-	messages = append(messages, map[string]interface{}{
-		"role":    "user",
-		"content": contentParts,
-	})
-
-	// Final payload
-	modelString := g.Model
+	// Payload
 	payload := map[string]interface{}{
-		"model":    modelString,
+		"model":    g.Model,
 		"stream":   false,
 		"messages": messages,
 	}
@@ -125,10 +115,8 @@ func (g *Groq) Generate(message ChatMessage) (*ChatResponse, error) {
 		return nil, err
 	}
 
-	var responseText string
-	var usage *Usage
-
 	// Extract assistant text
+	var responseText string
 	if choices, ok := parsed["choices"].([]interface{}); ok && len(choices) > 0 {
 		if choice, ok := choices[0].(map[string]interface{}); ok {
 			if msg, ok := choice["message"].(map[string]interface{}); ok {
@@ -138,10 +126,10 @@ func (g *Groq) Generate(message ChatMessage) (*ChatResponse, error) {
 			}
 		}
 	}
-	usage = &Usage{}
-	// Extract usage
-	if u, ok := parsed["usage"].(map[string]interface{}); ok {
 
+	// Extract usage
+	usage := &Usage{}
+	if u, ok := parsed["usage"].(map[string]interface{}); ok {
 		if v, ok := u["prompt_tokens"].(float64); ok {
 			usage.PromptTokens = int(v)
 		}
@@ -152,15 +140,16 @@ func (g *Groq) Generate(message ChatMessage) (*ChatResponse, error) {
 			usage.TotalTokens = int(v)
 		}
 	}
+
 	if usage.TotalTokens == 0 {
 		fmt.Println("Error occured, raw response: ", string(respBody))
 	}
+
 	return &ChatResponse{
 		Text:  responseText,
 		Usage: usage,
 	}, nil
 }
-
 func (g *Groq) ListIternalProviders() ([]string, error) {
 	//Groq is just groq
 	var providers []string
@@ -169,7 +158,7 @@ func (g *Groq) ListIternalProviders() ([]string, error) {
 }
 
 func (g *Groq) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
-	if withPhoto{
+	if withPhoto {
 		fmt.Println("Groq does not support multimodal filter")
 	}
 	req, err := http.NewRequest("GET", "https://api.groq.com/openai/v1/models", nil)
