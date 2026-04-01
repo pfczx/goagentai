@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/charmbracelet/glamour"
@@ -21,16 +22,23 @@ func Exit(a *agent.Agent) error {
 	os.Exit(0)
 	return nil
 }
-
 func Help() error {
-	commands := GetCommands()
+	commandsMap := GetCommands()
+	
+	// Pobranie i sortowanie kluczy
+	keys := make([]string, 0, len(commandsMap))
+	for key := range commandsMap {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	
 	var builder strings.Builder
 
 	builder.WriteString("# GoAgent Help\n\n")
-
 	builder.WriteString("## Available Commands\n\n")
 
-	for _, cmd := range commands {
+	for _, key := range keys {
+		cmd := commandsMap[key]
 		builder.WriteString(fmt.Sprintf("### `%s`  ", cmd.Name))
 		builder.WriteString("alias: " + cmd.Alias)
 		builder.WriteString("\n")
@@ -46,7 +54,6 @@ func Help() error {
 	fmt.Print(out)
 	return nil
 }
-
 func LoadEnv() error {
 	home, err := os.UserHomeDir()
 	if err != nil {

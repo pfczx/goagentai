@@ -63,19 +63,19 @@ func GetCommands() map[string]CliCommand {
 		"ask": {
 			Name:     "ask",
 			Alias:    "a",
-			Desc:     "Ask [flag] [prompt] (spaces works in prompt) llm question provided in first argument -s flag for adding screenshot with github.com/kbinani/screenshot \n\nPhotos are converted to base64 format, it may be too big for low token limit api",
+			Desc:     "Ask [flag] [prompt] (spaces works in prompt) llm question provided in first argument, -s flag for adding screenshot with github.com/kbinani/screenshot, Your system should meet the requirements of dependencies if -s flag is used: \n\nLinux/FreeBSD - https://github.com/BurntSushi/xgb \n\nOSX - cgo. \n\nDo not panic if errors occur, simply check if model see your screen with simple prompt \n\nPhotos are converted to base64 format, it may be too big for low token limit api",
 			Callback: agent.RunAsk,
 		},
 		"switch": {
 			Name:     "switch",
 			Alias:    "s",
-			Desc:     "Switching setting provided in first argument, instead of a name you can provide numbers from command list without flags \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  \n\nprofile : p \n\ninternal-provider : ip \n\nprovider : pv \n\nmodel : m",
+			Desc:     "Switching setting provided in first argument, instead of a name you can provide numbers from command list without flags \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  profile : p  internal-provider : ip  provider : pv  model : m",
 			Callback: agent.Switch,
 		},
 		"list": {
 			Name:     "list",
 			Alias:    "l",
-			Desc:     "Print list of selected things \n\nlist [thing to list or alias] \n\nfirst arguments -> \n\nprofiles : p \n\nproviders : pv \n\nintenral-providers : ip \n\nmodels  : m -img flag for listing models accepting photo input(only works for HuggingFace, for other providers you need to visit their website )",
+			Desc:     "Print list of selected things \n\nlist [thing to list or alias] \n\nfirst arguments -> profiles : p  providers : pv  intenral-providers : ip  models  : m -img flag for listing models accepting photo input(only works for HuggingFace, for other providers you need to visit their website )",
 			Callback: agent.List,
 		},
 		"config": {
@@ -87,13 +87,13 @@ func GetCommands() map[string]CliCommand {
 		"workspace": {
 			Name:     "workspace",
 			Alias:    "w",
-			Desc:     "Execute workspace command provided in first argumet \n\nfirst arguments -> \n\nadd : a [filepath or directory] -p (p flag for persistent adding, without flag all content of workspace is erased after next ask)\n\nremove : r [filepath or directory] or all (clearing all workspace content) \n\nlist : l (listing all workspace paths) all flag for listing with content",
+			Desc:     "Execute workspace command provided in first argumet \n\nfirst arguments ->  add : a [filepath or directory] -p (p flag for persistent adding, without flag all content of workspace is erased after next ask)  remove : r [filepath or directory] or all (clearing all workspace content)  list : l (listing all workspace paths) all flag for listing with content",
 			Callback: agent.Workspace,
 		},
 		"remove": {
 			Name:     "remove",
 			Alias:    "r",
-			Desc:     "Removes specified thing in firts argument \n\nfirst arguments -> \n\nprofile : p [profile_name]\n\nhistory : h [history_type] (long-term : lt or short-term : st) \n\n used-tokens : ut (set used tokens to 0)",
+			Desc:     "Removes specified thing in firts argument \n\nfirst arguments ->  profile : p [profile_name]  history : h [history_type] (long-term : lt or short-term : st)  used-tokens : ut (set used tokens to 0)",
 			Callback: agent.Remove,
 		},
 	}
