@@ -3,16 +3,16 @@ package memory
 import (
 	"context"
 	"database/sql"
+	"embed"
 	"encoding/json"
 	"fmt"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/pfczx/goagentai/memory/db/generated"
+	"github.com/pressly/goose/v3"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
-
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/pfczx/goagentai/memory/db/generated"
-	"github.com/pressly/goose/v3"
 )
 
 type MemoryHandler struct {
@@ -27,33 +27,36 @@ func (m *MemoryHandler) CloseDB() error {
 	return m.db.Close()
 }
 
+//go:embed db/schema/*.sql
+var embedMigrations embed.FS
+
 func InitDatabase() (*sql.DB, *generated.Queries, error) {
-	path, err := os.UserHomeDir()
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return nil, nil, err
 	}
-	dbPath := filepath.Join(path, ".config", "goagent", "long_term.db")
+	dbPath := filepath.Join(home, ".config", "goagent", "long_term.db")
 
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, nil, fmt.Errorf("cannot open database: %w", err)
 	}
-	//supress goose output
+
 	silentLogger := log.New(io.Discard, "", 0)
 	goose.SetLogger(silentLogger)
 	db.SetMaxOpenConns(1)
+
 	if err := goose.SetDialect("sqlite3"); err != nil {
 		return nil, nil, err
 	}
-	migrationsPath := "memory/db/schema"
-	if err := goose.Up(db, migrationsPath); err != nil {
+	goose.SetBaseFS(embedMigrations)
+
+	if err := goose.Up(db, "db/schema"); err != nil {
 		return nil, nil, fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	return db, generated.New(db), nil
-
 }
-
 func NewMemoryHandler() (*MemoryHandler, error) {
 	database, q, err := InitDatabase()
 	if err != nil {

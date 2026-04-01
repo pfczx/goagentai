@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
 )
 
 type Groq struct {
@@ -189,5 +190,6 @@ func (g *Groq) ListProviderModels(provider string, withPhoto bool) ([]string, er
 	for _, m := range raw.Data {
 		models = append(models, m.Id)
 	}
+	sort.Strings(models)
 	return models, nil
 }

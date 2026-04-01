@@ -14,54 +14,59 @@ import (
 	"github.com/pfczx/goagentai/llm"
 )
 
-func screenshotAndConvert() (string, error) {
+func chooseDisplay() (int, error) {
 	n := screenshot.NumActiveDisplays()
-
 	if n == 0 {
-		return "", fmt.Errorf("no displays found")
+		return -1, fmt.Errorf("no displays found")
 	}
-
-	var displayIndex int
 
 	if n == 1 {
-		displayIndex = 0
-	} else {
-		fmt.Println("Select display:")
-
-		for i := 0; i < n; i++ {
-			b := screenshot.GetDisplayBounds(i)
-			fmt.Printf("[%d] %dx%d\n", i, b.Dx(), b.Dy())
-		}
-
-		reader := bufio.NewReader(os.Stdin)
-
-		for {
-			fmt.Print("Enter display number: ")
-			input, _ := reader.ReadString('\n')
-			input = strings.TrimSpace(input)
-
-			idx, err := strconv.Atoi(input)
-			if err != nil || idx < 0 || idx >= n {
-				fmt.Println("Invalid selection, try again.")
-				continue
-			}
-
-			displayIndex = idx
-			break
-		}
+		return 0, nil
 	}
 
-	bounds := screenshot.GetDisplayBounds(displayIndex)
+	fmt.Println("Select display:")
+	for i := 0; i < n; i++ {
+		b := screenshot.GetDisplayBounds(i)
+		fmt.Printf("[%d] %dx%d\n", i, b.Dx(), b.Dy())
+	}
 
+	reader := bufio.NewReader(os.Stdin)
+	for {
+		fmt.Print("Enter display number: ")
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+		idx, err := strconv.Atoi(input)
+		if err != nil || idx < 0 || idx >= n {
+			fmt.Println("Invalid selection, try again.")
+			continue
+		}
+		return idx, nil
+	}
+}
+
+func screenshotAndConvert(displayIndex int) (string, error) {
+	oldStderr := os.Stderr
+	f, err := os.OpenFile("/dev/null", os.O_WRONLY, 0)
+	if err != nil {
+		return "", err
+	}
+	os.Stderr = f
+	defer func() {
+		os.Stderr = oldStderr
+		f.Close()
+	}()
+
+	bounds := screenshot.GetDisplayBounds(displayIndex)
 	img, err := screenshot.CaptureRect(bounds)
 	if err != nil {
 		return "", err
 	}
+
 	var buf bytes.Buffer
-	err = png.Encode(&buf, img)
-	if err != nil {
+	if err := png.Encode(&buf, img); err != nil {
 		return "", err
 	}
+
 	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
 
@@ -87,7 +92,11 @@ func BuildAsk(prompt string, context []string, triggerScreenshot bool) (llm.Chat
 		})
 
 	if triggerScreenshot {
-		imgConverted, err := screenshotAndConvert()
+		d, err := chooseDisplay()
+		if err != nil {
+			return llm.ChatMessage{}, err
+		}
+		imgConverted, err := screenshotAndConvert(d)
 		if err != nil {
 			return llm.ChatMessage{}, err
 		}

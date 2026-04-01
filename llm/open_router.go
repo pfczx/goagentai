@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
 	"strings"
 )
 
@@ -191,7 +192,7 @@ func (v *Openrouter) ListIternalProviders() ([]string, error) {
 	for _, p := range raw.Data {
 		providers = append(providers, p.Slug)
 	}
-
+	sort.Strings(providers)
 	return providers, nil
 }
 
@@ -238,6 +239,6 @@ func (o *Openrouter) ListProviderModels(provider string, withPhoto bool) ([]stri
 	for name := range modelsMap {
 		models = append(models, name)
 	}
-
+	sort.Strings(models)
 	return models, nil
 }

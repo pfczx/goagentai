@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"sort"
 )
 
 type HuggingFace struct {
@@ -180,6 +181,7 @@ func (h *HuggingFace) ListIternalProviders() ([]string, error) {
 		"together",
 		"zai-org",
 	}
+	sort.Strings(list)
 	return list, nil
 }
 
@@ -209,7 +211,7 @@ func (h *HuggingFace) ListProviderModels(provider string, withPhoto bool) ([]str
 	for _, model := range models {
 		modelsList = append(modelsList, model.Id)
 	}
-
+	sort.Strings(modelsList)
 	return modelsList, nil
 
 }
