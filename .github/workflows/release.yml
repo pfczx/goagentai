@@ -24,8 +24,10 @@ jobs:
           go-version: stable
 
       - name: Build Linux/macOS artifacts
-        run: |
-          goreleaser build --rm-dist --config .goreleaser.yaml-unix
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: build --rm-dist --config .goreleaser.yaml-unix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -48,8 +50,10 @@ jobs:
           go-version: stable
 
       - name: Build Windows artifacts
-        run: |
-          goreleaser build --rm-dist --config .goreleaser.yaml-windows
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: build --rm-dist --config .goreleaser.yaml-windows
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -57,7 +61,7 @@ jobs:
           name: windows-artifact
           path: dist/*
 
-  # Release – uruchamia się dopiero po obu buildach
+  # Release
   release:
     runs-on: ubuntu-latest
     needs: [build_unix, build_windows]
