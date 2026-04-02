@@ -27,7 +27,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
-          args: build --rm-dist --config .goreleaser.yaml
+          args: build --config .goreleaser.yaml
         env:
           CGO_ENABLED: 0
 
@@ -55,7 +55,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
-          args: build --rm-dist --config .goreleaser.yaml
+          args: build  --config .goreleaser.yaml
         env:
           CGO_ENABLED: 1
 
