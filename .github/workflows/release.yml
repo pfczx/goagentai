@@ -77,7 +77,8 @@ jobs:
         with:
           name: windows-artifact
           path: dist/windows
-
+      - name: DEBUG FILES
+        run: find . -type f
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
