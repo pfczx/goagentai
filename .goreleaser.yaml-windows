@@ -4,21 +4,18 @@ builds:
   - binary: goagentai
     main: ./main.go
     goos:
-      - linux
       - windows
-      - darwin
     goarch:
       - "386"
       - "amd64"
       - "arm64"
     ldflags:
       - -s -w
+    env:
+      CGO_ENABLED: "1" 
 
 archives:
-  - format: tar.gz
-    format_overrides:
-      - goos: windows
-        format: zip
+  - format: zip
 
 checksum:
   name_template: "checksums.txt"

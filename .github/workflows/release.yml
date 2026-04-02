@@ -9,9 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  goreleaser:
+  # Linux + macOS build
+  build_unix:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,10 +23,32 @@ jobs:
         with:
           go-version: stable
 
-      - name: Run GoReleaser
+      - name: Run GoReleaser for Linux/macOS
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean
+          args: release --clean --skip-publish --config .goreleaser.yaml-unix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Windows build
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Run GoReleaser for Windows
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --clean --skip-publish --config .goreleaser.yaml-windows
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
