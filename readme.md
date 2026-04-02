@@ -26,18 +26,22 @@ The project is written in Go and bundles a lightweight file‑based SQLite datab
 
 ---
 
-## Architecture Overview```
+## Architecture Overview
+```
 github.com/pfczx/goagentai
 │
-├─ agent/          # Core *Agent* struct, factories and core logic│   ├─ agent.go        ← Agent definition and Generate wrapper
+├─ agent/          # Core *Agent* struct, factories and core logic
+│   ├─ agent.go        ← Agent definition and Generate wrapper
 │   ├─ agent_runner.go ← Execution flow, context building & token handling
 │   ├─ config.go       ← YAML schema, validation, comment injection
 │   ├─ list_command.go ← Directory provider and model/provider lists
 │   ├─ profile.go      ← Profile lifecycle (creation, loading, default)
-│   ├─ remove_command.go ← Deletion of profiles, history, used‑tokens│   ├─ switch_command.go ← Switching provider / model / internal provider
+│   ├─ remove_command.go ← Deletion of profiles, history, used‑tokens
+│   ├─ switch_command.go ← Switching provider / model / internal provider
 │   └─ workspace_commands.go ← Workspace add / remove / list operations
 │
-├─ cli/            # REPL & command dispatch utilities│   ├─ commands.go   ← Mapping of CLI keywords to callbacks
+├─ cli/            # REPL & command dispatch utilities
+│   ├─ commands.go   ← Mapping of CLI keywords to callbacks
 │   ├─ repl.go       ← Interactive prompt loop
 │   ├─ singlerun.go  ← One‑shot handling for `goagentai <cmd>`
 │   └─ utils.go      ← Helper rendering, env loading, exit handling
@@ -46,14 +50,18 @@ github.com/pfczx/goagentai
 │   ├─ groq.go       ← Direct HTTP interaction with Groq
 │   ├─ huggingface.go← HTTP interaction with HF inference API
 │   ├─ llm.go        ← Provider interface and factory
-│   └─ open_router.go← HTTP interaction with OpenRouter│
+│   └─ open_router.go← HTTP interaction with OpenRouter
+│
 ├─ memory/         # Persistent storage (SQLite) and semantic operations
 │   ├─ db_handler.go ← Migration handling with goose
-│   ├─ generated/*   ← SQLC‑generated types & query functions│   ├─ long_term.go  ← Summary generation and IDF weighting
+│   ├─ generated/*   ← SQLC‑generated types & query functions
+│   ├─ long_term.go  ← Summary generation and IDF weighting
 │   ├─ menager.go    ← Public façade for Short‑/Long‑Term Memory
-│   ├─ short_term.go ← JSON storage of recent turns│   └─ text_analyzer.go ← TF‑IDF analyzer for relevance selection
+│   ├─ short_term.go ← JSON storage of recent turns
+│   └─ text_analyzer.go ← TF‑IDF analyzer for relevance selection
 │
-├─ workspace/      # OPTIONAL persistent workspace of file “content” snippets│   ├─ menager.go   ← Simple slice of *Entry* structs
+├─ workspace/      # OPTIONAL persistent workspace of file “content” snippets
+│   ├─ menager.go   ← Simple slice of *Entry* structs
 │   └─ workspace.go ← Load, add, clear, render utilities
 │
 ├─ token/          # Token consumption accounting
