@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"image"
 	"image/png"
 	"os"
 	"strconv"
@@ -24,10 +25,17 @@ func chooseDisplay() (int, error) {
 		return 0, nil
 	}
 
-	fmt.Println("Select display:")
+	//separate loops for redability in case of xbg errors
+	var rects []image.Rectangle
+
 	for i := 0; i < n; i++ {
 		b := screenshot.GetDisplayBounds(i)
-		fmt.Printf("[%d] %dx%d\n", i, b.Dx(), b.Dy())
+		rects = append(rects, b)
+	}
+	fmt.Println("Select display:")
+
+	for i := 0; i < n; i++ {
+		fmt.Printf("[%d] %dx%d\n", i, rects[i].Dx(), rects[i].Dy())
 	}
 
 	reader := bufio.NewReader(os.Stdin)
@@ -45,17 +53,6 @@ func chooseDisplay() (int, error) {
 }
 
 func screenshotAndConvert(displayIndex int) (string, error) {
-	oldStderr := os.Stderr
-	f, err := os.OpenFile("/dev/null", os.O_WRONLY, 0)
-	if err != nil {
-		return "", err
-	}
-	os.Stderr = f
-	defer func() {
-		os.Stderr = oldStderr
-		f.Close()
-	}()
-
 	bounds := screenshot.GetDisplayBounds(displayIndex)
 	img, err := screenshot.CaptureRect(bounds)
 	if err != nil {

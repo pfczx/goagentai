@@ -7,9 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"time"
 
-	"github.com/briandowns/spinner"
 	"github.com/charmbracelet/glamour"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/token"
@@ -109,14 +107,12 @@ func RunAsk(agent *Agent, args ...string) error {
 		}
 
 	}
-	s := spinner.New(spinner.CharSets[78], 100*time.Millisecond)
-	s.Suffix = " Generating Response..."
-	s.Start()
+
 	resp, err := agent.Ask(prompt, context, triggerScreenshot)
 	if err != nil {
 		return err
 	}
-	s.Stop()
+
 	out, err := glamour.Render(resp.Text, "auto")
 	if err != nil {
 		return err

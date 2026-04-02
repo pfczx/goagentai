@@ -1,7 +1,9 @@
 package agent
 
 import (
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/pfczx/goagentai/llm"
 	"github.com/pfczx/goagentai/memory"
 	"github.com/pfczx/goagentai/prompt"
@@ -30,11 +32,15 @@ func (a *Agent) Ask(input string, context []string, triggerScreenshot bool) (*ll
 	if err != nil {
 		return nil, err
 	}
-
+	s := spinner.New(spinner.CharSets[78], 100*time.Millisecond)
+	s.Suffix = " Generating Response..."
+	s.Start()
 	llmResponse, err := a.Profile.Provider.Generate(message)
 	if err != nil {
 		return nil, err
 	}
+	s.Stop()
+
 	return llmResponse, nil
 
 }
