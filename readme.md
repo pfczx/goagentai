@@ -12,7 +12,7 @@ The project is written in Go and bundles a lightweight file‑based SQLite datab
 4. [Configuration & Profiles](#configuration--profiles)  
 5. [Command‑Line Interface (CLI) Reference](#cli-reference)  
    - 5.1 [init](#init)  
-   - 5.2 [ask/#40263](#ask)  
+   - 5.2 [ask](#ask)  
    - 5.3 [switch](#switch)  
    - 5.4 [list](#list)  
    - 5.5 [workspace](#workspace)  
