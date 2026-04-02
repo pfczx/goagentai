@@ -23,9 +23,6 @@ The project is written in Go and bundles a lightweight file‑based SQLite datab
 7. [Workspace Management](#workspace-management)  
 8. [Token Tracking](#token-tracking)  
 9. [Running the Application](#running-the-application)  
-10. [Extending / Contributing](#contributing)  
-11. [License](#license)  
-
 ---
 
 ## Architecture Overview
