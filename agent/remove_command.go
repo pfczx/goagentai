@@ -7,12 +7,15 @@ import (
 )
 
 func Remove(a *Agent, args ...string) error {
-	if len(args) == 0 {
+	if len(args) < 1 {
 		return fmt.Errorf("No subcommand provided")
 	}
 
 	switch args[0] {
 	case "profile", "p":
+		if len(args) < 2 {
+			return fmt.Errorf("expecting profile name")
+		}
 		if a.Profile.Name == args[1] {
 			return fmt.Errorf("Switch profile before deleting")
 		}
@@ -38,6 +41,9 @@ func Remove(a *Agent, args ...string) error {
 		return nil
 
 	case "history", "h":
+		if len(args) < 2 {
+			return fmt.Errorf("expecting history type")
+		}
 		if args[1] == "short-term" || args[1] == "st" {
 			a.MemoryMenager.ClearShortTerm()
 			return nil

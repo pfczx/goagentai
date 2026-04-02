@@ -5,14 +5,14 @@ import (
 )
 
 func Workspace(a *Agent, args ...string) error {
-	if len(args) == 0 {
+	if len(args) < 1 {
 		return fmt.Errorf("No subcommand provided")
 	}
 
 	switch args[0] {
 	case "add", "a":
 		if len(args) < 2 {
-			return fmt.Errorf("Usage: workspace add <path> [-p]")
+			return fmt.Errorf("Usage: workspace add [path] [-p]")
 		}
 		if len(args) > 3 {
 			return fmt.Errorf("Too many arguments")
@@ -33,7 +33,7 @@ func Workspace(a *Agent, args ...string) error {
 
 	case "remove", "r":
 		if len(args) < 2 {
-			return fmt.Errorf("Usage: workspace remove <path|all>")
+			return fmt.Errorf("Usage: workspace remove [path or all]")
 		}
 		a.WorspaceMenager.Clear(args[1])
 

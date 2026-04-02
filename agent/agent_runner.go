@@ -75,7 +75,7 @@ func InitAgent(profileName string) (*Agent, error) {
 }
 
 func RunAsk(agent *Agent, args ...string) error {
-	if len(args) == 0 {
+	if len(args) < 1 {
 		return fmt.Errorf("no question provided")
 	}
 
