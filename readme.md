@@ -16,8 +16,10 @@ The project is written in Go and bundles a lightweight file‑based SQLite datab
    - 5.3 [switch](#switch)  
    - 5.4 [list](#list)  
    - 5.5 [workspace](#workspace)  
-   - 5.6 [remove](#remove)     - 5.7 [config](#config)  
-   - 5.8 [exit / help](#exit--help)  6. [Memory System](#memory-system)  
+   - 5.6 [remove](#remove)
+   - 5.7 [config](#config)  
+   - 5.8 [exit / help](#exit--help)
+6. [Memory System](#memory-system)  
 7. [Workspace Management](#workspace-management)  
 8. [Token Tracking](#token-tracking)  
 9. [Running the Application](#running-the-application)  
@@ -65,7 +67,9 @@ github.com/pfczx/goagentai
 │   └─ workspace.go ← Load, add, clear, render utilities
 │
 ├─ token/          # Token consumption accounting
-│   └─ menager.go   ← Simple in‑memory read/write of usage counters
+│    ├─ token.go     ← Simple in‑memory read/write of usage counters
+│    └─ menager.go   ← Public façade for token package, save/load utilities
+│    
 │
 ├─ go.mod / go.sum # Dependency list (includes https://github.com/kbinani/screenshot)
 └─ main.go         # Profile bootstrap and entry point
@@ -73,46 +77,53 @@ github.com/pfczx/goagentai
 
 ---
 
-## Prerequisites
+## Prerequisites for building from source
 
 | Item | Reason |
 |------|--------|
 | **Go 1.25+** | Required by `go.mod`. |
 | **Git** | To clone the repository. |
-| **SQLite library** (optional) | Used for internal DB; Go driver `github.com/mattn/go-sqlite3` has CGO dependencies. |
-| **Environment variables** | Create a `.env` file in `~/.config/goagent/` containing one of the following keys: `GROQ`, `HUGGING_FACE`, `OPEN_ROUTER`.  The value is the provider‑specific API key. |
 | **Terminal with ANSI colour support** | For nicer REPL prompting (charmbracelet packages rely on it). |
+|** XGB for linux/BSD or cgo for OSX**| screenshot package dependancies github.com/kbinani/screenshot |
 
 ---
 
-## Installation
+## Installation from source
 
 ```bash
 # Clone the repository
 git clone https://github.com/pfczx/goagentai.git
 cd goagentai
 
-# Build a single binary (optional)
-go build -o goagentai ./main.go
+# System wide installation
+go install
 ```
 
-Move the binary to a location on your `$PATH` (e.g. `~/.local/bin/goagentai`) or invoke it via `go run ./...`.
+Invoke it via `go run ./...`, or build binary with `go build -o goagentai` or `go build -o goagentai.exe` for windows 
 
 ---
 
-## Configuration & Profiles### Profile Directory Layout
+## Configuration & Profiles
 
+
+### Profile Directory Layout (auto generated)
 ```
 ~/.config/goagent/
+├─ latestProfile                     ← Latest used profile name 
+│
+├─long_term.db                       ← SQLite long term memory database 
 │
 ├─ profiles/
 │   ├─ <profile_name>/               ← Individual folders per profile
-│   │   ├─ config.yaml               ← Human‑editable configuration
+│   │   ├─ config.yaml               ← Human‑editable configuration witg config command
 │   │   └─ shortTermMemory.json      ← Auto‑created memory file
-│   └─ default/                      ← Auto‑generated fallback profile```
+│   └─ default/                      ← Auto‑generated fallback profile
+```
 
-Each profile contains:
+---
 
+### Each profile config contains:
+```
 | Field | Description |
 |-------|-------------|
 | `name` | Human readable identifier (also the folder name). |
@@ -122,16 +133,18 @@ Each profile contains:
 | `memory_on` | Toggle persistent memory usage. |
 | … | A total of ~15 flags controlling memory limits, summarisation settings, token budget, output format, etc. |
 
-### Default Configuration
+```
+---
 
-Run **once** to create the default profile:
-
+### Init command:
 ```bash
-goagentai init default
+goagentai init profile1
 ```
 
-The command creates `~/.config/goagent/profiles/default/config.yaml` populated with the template from `config.go`.  
+The command creates `~/.config/goagent/profiles/profile1/config.yaml` populated with the template from `config.go`.  
 To create additional profiles, repeat the command with a new name (e.g. `goagentai init myprofile`).
+
+---
 
 ### Editing Configuration
 
@@ -153,6 +166,8 @@ goagentai <subcommand> [args...]
 or interactively via REPL (`goagentai`).  
 Aliases are documented in the help output (`goagentai help`).
 
+---
+
 ### 1. `init` / `i`
 
 Creates a new profile.
@@ -162,6 +177,8 @@ goagentai init <profile_name>
 ```
 
 *If a profile with that name already exists the command aborts.*
+
+---
 
 ### 2. `ask` / `a`
 
@@ -185,6 +202,8 @@ Output is rendered:
 
 The command returns token usage statistics when available.
 
+---
+
 ### 3. `switch` / `s`
 
 Switches various runtime settings:
@@ -198,6 +217,8 @@ Switches various runtime settings:
 
 Numbers refer to the order shown by `list`/`list providers`.
 
+---
+
 ### 4. `list` / `l`
 
 Prints catalogues of **profiles**, **providers**, **internal providers**, or **models**.
@@ -209,6 +230,8 @@ goagentai list profiles
 goagentai list providers
 goagentai list models -img   # (only applies to providers supporting multimodal models)
 ```
+
+---
 
 ### 5. `workspace` / `w`
 
@@ -222,6 +245,8 @@ Manipulates a *file workspace* attached to the current profile.
 
 The workspace content is injected into LLM prompts when `triggerScreenshot` is enabled or when memory is to be enriched.
 
+---
+
 ### 6. `remove` / `r`
 
 Deletes profile‑related data or usage statistics.
@@ -232,9 +257,13 @@ Deletes profile‑related data or usage statistics.
 | `history <st|lt>` | Clears short‑term or long‑term stored memories of the current profile. |
 | `used-tokens` | Resets the token usage counter stored on disk. |
 
+---
+
 ### 7. `config` / `c`
 
 Opens the profile’s `config.yaml` for manual editing; afterwards the agent is re‑initialised with the updated configuration.
+
+---
 
 ### 8. `exit` / `e` and `help` / `h`
 
