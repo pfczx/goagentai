@@ -24,7 +24,7 @@ jobs:
           go-version: stable
 
       - name: Build Linux/macOS artifacts
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
           args: build --rm-dist --config .goreleaser.yaml
@@ -52,7 +52,7 @@ jobs:
           go-version: stable
 
       - name: Build Windows artifacts
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
           args: build --rm-dist --config .goreleaser.yaml
@@ -86,7 +86,7 @@ jobs:
           path: dist/windows
 
       - name: Create release
-        uses: goreleaser/goreleaser-action@v5
+        uses: goreleaser/goreleaser-action@v7
         with:
           version: latest
           args: release --clean --skip-validate --skip-build
