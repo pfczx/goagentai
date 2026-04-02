@@ -12,6 +12,8 @@ jobs:
   # Linux + macOS build
   build_unix:
     runs-on: ubuntu-latest
+    outputs:
+      artifact-path: ${{ steps.build.outputs.artifact }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,13 +25,17 @@ jobs:
         with:
           go-version: stable
 
-      - name: Run GoReleaser for Linux/macOS
-        uses: goreleaser/goreleaser-action@v5
+      - name: Build Linux/macOS artifacts
+        id: build
+        run: |
+          goreleaser build --rm-dist --config .goreleaser.yaml-unix
+          echo "artifact=dist/*" >> $GITHUB_OUTPUT
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
-          version: latest
-          args: release --clean --config .goreleaser.yaml-unix
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: unix-artifact
+          path: dist/*
 
   # Windows build
   build_windows:
@@ -45,10 +51,40 @@ jobs:
         with:
           go-version: stable
 
-      - name: Run GoReleaser for Windows
+      - name: Build Windows artifacts
+        run: |
+          goreleaser build --rm-dist --config .goreleaser.yaml-windows
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-artifact
+          path: dist/*
+
+  # Release
+  release:
+    runs-on: ubuntu-latest
+    needs: [build_unix, build_windows]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Unix artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: unix-artifact
+          path: dist
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-artifact
+          path: dist
+
+      - name: Create release
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean --config .goreleaser.yaml-windows
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
