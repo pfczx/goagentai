@@ -6,7 +6,6 @@ builds:
     goos:
       - windows
     goarch:
-      - "386"
       - "amd64"
     ldflags:
       - -s -w
