@@ -123,7 +123,7 @@ Invoke it via `go run ./...`, or build binary with `go build -o goagentai` or `g
 ---
 
 ### Each profile config contains:
-```
+
 | Field | Description |
 |-------|-------------|
 | `name` | Human readable identifier (also the folder name). |
@@ -133,15 +133,14 @@ Invoke it via `go run ./...`, or build binary with `go build -o goagentai` or `g
 | `memory_on` | Toggle persistent memory usage. |
 | … | A total of ~15 flags controlling memory limits, summarisation settings, token budget, output format, etc. |
 
-```
 ---
 
-### Init command:
+### Init command
 ```bash
 goagentai init profile1
 ```
 
-The command creates `~/.config/goagent/profiles/profile1/config.yaml` populated with the template from `config.go`.  
+The command creates `~/.config/goagent/profiles/profile1/config.yaml` populated with the default template from `config.go`.  
 To create additional profiles, repeat the command with a new name (e.g. `goagentai init myprofile`).
 
 ---
@@ -149,7 +148,8 @@ To create additional profiles, repeat the command with a new name (e.g. `goagent
 ### Editing Configuration
 
 ```bash
-goagentai config```
+goagentai config
+```
 
 The command launches `$EDITOR` (defaults to `nano` on Unix, `notepad` on Windows) on the selected profile’s `config.yaml`. Once the editor exits, the CLI reloads the profile automatically.
 
