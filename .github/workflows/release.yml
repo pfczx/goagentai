@@ -27,7 +27,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean --skip-publish --config .goreleaser.yaml-unix
+          args: release --clean --config .goreleaser.yaml-unix
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -49,6 +49,6 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean --skip-publish --config .goreleaser.yaml-windows
+          args: release --clean --config .goreleaser.yaml-windows
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
