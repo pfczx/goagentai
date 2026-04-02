@@ -82,7 +82,9 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/unix/**
-            dist/windows/**
+            dist/**/*.zip
+            dist/**/*.tar.gz
+            dist/**/checksums.txt*
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
