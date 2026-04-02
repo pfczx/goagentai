@@ -234,7 +234,7 @@ func (o *Openrouter) ListProviderModels(provider string, withPhoto bool) ([]stri
 
 	}
 	var models []string
-	infoString := "Free models cannot be listed via api, visit https://openrouter.ai/models?q=free to check free models then paste model name from quickstart"
+	infoString := "Free models cannot be listed via api, visit https://openrouter.ai/models?q=free to check free models then paste model name from quickstart window, example name qwen3-coder:free"
 	fmt.Println(infoString)
 	for name := range modelsMap {
 		models = append(models, name)
