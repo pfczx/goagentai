@@ -198,7 +198,7 @@ func (v *Openrouter) ListIternalProviders() ([]string, error) {
 
 func (o *Openrouter) ListProviderModels(provider string, withPhoto bool) ([]string, error) {
 	if withPhoto {
-		fmt.Println("OpenRouter does not support multimodal filter")
+		fmt.Println("OpenRouter does not support multimodal filter, alternative is setting provider to openrouter and model to free for automatic model selection")
 	}
 	req, err := http.NewRequest("GET", "https://openrouter.ai/api/v1/models/user", nil)
 	if err != nil {
