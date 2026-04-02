@@ -12,10 +12,13 @@ builds:
     ldflags:
       - -s -w
     env:
-      CGO_ENABLED: "1" 
+      CGO_ENABLED: "1"
 
 archives:
   - format: zip
+    files:
+      - LICENSE
+      - README.md
 
 checksum:
   name_template: "checksums.txt"
