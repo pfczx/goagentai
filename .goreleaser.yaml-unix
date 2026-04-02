@@ -21,3 +21,4 @@ archives:
 
 checksum:
   name_template: "checksums.txt"
+dist: dist/unix
