@@ -27,13 +27,13 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: build --rm-dist --config .goreleaser.yaml-unix
+          args: build --rm-dist --config .goreleaser.yaml-unix --dist  dist/unix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: unix-artifact
-          path: dist/*
+          path: dist/unix/*
 
   # Windows build
   build_windows:
@@ -53,13 +53,13 @@ jobs:
         uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: build --rm-dist --config .goreleaser.yaml-windows
+          args: build --rm-dist --config .goreleaser.yaml-windows --dist dist/windows
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifact
-          path: dist/*
+          path: dist/windows/*
 
   # Release
   release:
@@ -73,13 +73,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: unix-artifact
-          path: dist
+          path: dist/unix
 
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
           name: windows-artifact
-          path: dist
+          path: dist/windows
 
       - name: Create release
         uses: goreleaser/goreleaser-action@v5
