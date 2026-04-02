@@ -20,17 +20,21 @@ builds:
         goarch: "arm64"
 
 archives:
-  # Linux/macOS → tar.gz
-  - goos: [linux, darwin]
-    format: tar.gz
+  - formats:
+      - tar.gz
+      - zip
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+      - goos: linux
+        formats:
+          - tar.gz
+      - goos: darwin
+          - tar.gz
     files:
       - LICENSE
       - README.md
-  # Windows → zip
-  - goos: windows
-    format: zip
-    files:
-      - LICENSE
-      - README.md
+
 checksum:
   name_template: "checksums.txt"
