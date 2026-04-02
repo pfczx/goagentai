@@ -9,7 +9,8 @@ permissions:
   contents: write
 
 jobs:
-  build_and_release:
+  # Linux + macOS build
+  build_unix:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,10 +23,72 @@ jobs:
         with:
           go-version: stable
 
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v7
+      - name: Build Linux/macOS artifacts
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean
+          args: build --rm-dist --config .goreleaser.yaml
+        env:
+          CGO_ENABLED: 0
+
+      - name: Upload Unix artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: unix-artifact
+          path: dist/*
+
+  # Windows build (amd64 only)
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Build Windows artifacts
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: build --rm-dist --config .goreleaser.yaml
+        env:
+          CGO_ENABLED: 1
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifact
+          path: dist/*
+
+  # Release – dopiero po obu buildach
+  release:
+    runs-on: ubuntu-latest
+    needs: [build_unix, build_windows]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Unix artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: unix-artifact
+          path: dist/unix
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifact
+          path: dist/windows
+
+      - name: Create release
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          version: latest
+          args: release --clean --skip-validate --skip-build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
