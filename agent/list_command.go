@@ -11,6 +11,10 @@ import (
 )
 
 func List(agent *Agent, args ...string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("list: missing sub‑command")
+	}
+
 	var builder strings.Builder
 	switch args[0] {
 	case "profiles", "p":

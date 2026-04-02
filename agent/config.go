@@ -7,22 +7,23 @@ import (
 )
 
 type Config struct {
-	Name                                        string  `yaml:"name"`
-	Path                                        string  `yaml:"path"`
-	Provider                                    string  `yaml:"provider"`
-	IternalProvider                             string  `yaml:"iternalprovider"`
-	Model                                       string  `yaml:"model"`
-	MemoryOn                                    bool    `yaml:"memory_on"`
-	ShortTermMemoryLimit                        int     `yaml:"short_term_memory_limit"`
-	ShortTermMemoryEvaluation                   bool    `yaml:"short_term_memory_evaluation_on"`
-	LongTermMemoryChunksToAdd                   int     `yaml:"long_term_memory_chunks_to_be_added_as_context"`
-	LongTermMemoryBufferSize                    int     `yaml:"long_term_memory_buffer_size"`
-	LongTermMemoryChunkSize                     int     `yaml:"long_term_memory_chunk_size"`
-	LongTermMemoryStorageSize                   int     `yaml:"long_term_memory_storage_size"`
-	LongTermMemorySummarizationProvider         string  `yaml:"long_term_memory_summarization_provider"`
-	LongTermMemorySummarizationInternalProvider string  `yaml:"long_term_memory_summarization_internal_provider"`
-	LongTermMemorySummarizationModel            string  `yaml:"long_term_memory_summarization_model"`
-	TokenBalanceLimit                           int     `yaml:"token_balance_limit"`
+	Name                                        string `yaml:"name"`
+	Path                                        string `yaml:"path"`
+	Provider                                    string `yaml:"provider"`
+	IternalProvider                             string `yaml:"iternalprovider"`
+	Model                                       string `yaml:"model"`
+	MemoryOn                                    bool   `yaml:"memory_on"`
+	ShortTermMemoryLimit                        int    `yaml:"short_term_memory_limit"`
+	ShortTermMemoryEvaluation                   bool   `yaml:"short_term_memory_evaluation_on"`
+	LongTermMemoryChunksToAdd                   int    `yaml:"long_term_memory_chunks_to_be_added_as_context"`
+	LongTermMemoryBufferSize                    int    `yaml:"long_term_memory_buffer_size"`
+	LongTermMemoryChunkSize                     int    `yaml:"long_term_memory_chunk_size"`
+	LongTermMemoryStorageSize                   int    `yaml:"long_term_memory_storage_size"`
+	LongTermMemorySummarizationProvider         string `yaml:"long_term_memory_summarization_provider"`
+	LongTermMemorySummarizationInternalProvider string `yaml:"long_term_memory_summarization_internal_provider"`
+	LongTermMemorySummarizationModel            string `yaml:"long_term_memory_summarization_model"`
+	TokenBalanceLimit                           int    `yaml:"token_balance_limit"`
+	MdFormat                                    bool   `yaml:"md_format"`
 }
 
 func DefaultConfig(name string, path string) *Config {
@@ -43,6 +44,7 @@ func DefaultConfig(name string, path string) *Config {
 		LongTermMemorySummarizationInternalProvider: "nscale",
 		LongTermMemorySummarizationModel:            "Qwen/Qwen3-4B-Instruct-2507",
 		TokenBalanceLimit:                           1000000,
+		MdFormat:                                    true,
 	}
 }
 
@@ -77,6 +79,7 @@ var yamlComments = map[string]string{
 
 	"long_term_memory_summarization_model:": "  Model for summarizing",
 	"token_balance_limit:":                  " Token usage for profile, if reached waring will be printed",
+	"md_format":                             "Print responses from ask in formated md, set to false to receive not formatted md",
 }
 
 func addYAMLComments(data []byte) []byte {
@@ -92,6 +95,7 @@ func addYAMLComments(data []byte) []byte {
 				indent := line[:len(line)-len(strings.TrimLeft(line, " "))]
 				commentLines := strings.Split(comment, "\n")
 
+				out = append(out, "")
 				for _, cLine := range commentLines {
 					cLine = strings.TrimSpace(cLine)
 					if cLine != "" {

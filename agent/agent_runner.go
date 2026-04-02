@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/charmbracelet/glamour"
@@ -74,6 +75,10 @@ func InitAgent(profileName string) (*Agent, error) {
 }
 
 func RunAsk(agent *Agent, args ...string) error {
+	if len(args) == 0 {
+		return fmt.Errorf("no question provided")
+	}
+
 	triggerScreenshot := false
 	promptParts := args
 
@@ -113,11 +118,17 @@ func RunAsk(agent *Agent, args ...string) error {
 		return err
 	}
 
-	out, err := glamour.Render(resp.Text, "auto")
-	if err != nil {
-		return err
+	if agent.Profile.Config.MdFormat {
+		out, err := glamour.Render(resp.Text, "auto")
+		if err != nil {
+			return err
+		}
+		fmt.Print(out)
+	} else {
+
+		fmt.Print(resp.Text + "\n")
 	}
-	fmt.Print(out)
+
 	if resp.Usage != nil {
 		fmt.Printf("Tokens prompt: %v completion: %v total: %v \n",
 			resp.Usage.PromptTokens,
@@ -163,9 +174,12 @@ func EditConfig(agent *Agent, args ...string) error {
 	configPath := filepath.Join(agent.Profile.Path, "config.yaml")
 	editor := os.Getenv("EDITOR")
 	if editor == "" {
-		editor = "nano"
+		if runtime.GOOS == "windows" {
+			editor = "notepad"
+		} else {
+			editor = "nano"
+		}
 	}
-
 	cmd := exec.Command(editor, configPath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

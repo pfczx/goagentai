@@ -81,6 +81,7 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 		LongTermMemorySummarizationInternalProvider: m.LongTermMemorySummarizationProvider.IternalProviderName(),
 		LongTermMemorySummarizationModel:            m.LongTermMemorySummarizationProvider.ModelName(),
 		TokenBalanceLimit:                           p.Config.TokenBalanceLimit,
+		MdFormat:                                    p.Config.MdFormat,
 	}
 	p.Config = config
 	err := SaveConfig(filepath.Join(p.Path, "config.yaml"), config)
@@ -91,12 +92,15 @@ func (p *Profile) UpdateConfigFromProfile(m *memory.MemoryMenager) error {
 }
 
 func InitProfile(args ...string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("profile name missing")
+	}
 	if ProfileExists(args[0]) {
 		return fmt.Errorf("Profile with this name arleady exists")
 	}
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return err
+		return fmt.Errorf("cannot determine user home directory: %w", err)
 	}
 	path := filepath.Join(homeDir, ".config", "goagent", "profiles", args[0])
 	if _, err := os.Stat(path); os.IsNotExist(err) {

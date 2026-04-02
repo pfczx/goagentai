@@ -13,6 +13,9 @@ func isNumber(s string) bool {
 }
 
 func Switch(agent *Agent, args ...string) error {
+	if len(args) < 2 {
+		return fmt.Errorf("missing sub‑command or argument")
+	}
 	switch args[0] {
 	case "profile", "p":
 		newAgent, err := InitAgent(args[1])
