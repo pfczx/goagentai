@@ -83,8 +83,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            *.zip
-            *.tar.gz
-            checksums.txt
+            dist/unix/**/goagentai
+            dist/windows/**/goagentai.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
