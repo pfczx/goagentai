@@ -9,9 +9,9 @@ permissions:
   contents: write
 
 jobs:
-  release_unix:
+  # Linux + macOS build
+  build_unix:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,18 +23,21 @@ jobs:
         with:
           go-version: stable
 
-      - name: Release (Linux/macOS)
-        uses: goreleaser/goreleaser-action@v7
+      - name: Build Linux/macOS artifacts
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: release --clean --config .goreleaser.yaml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          args: build --rm-dist --config .goreleaser.yaml-unix
 
-  release_windows:
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unix-artifact
+          path: dist/unix/*
+
+  # Windows build
+  build_windows:
     runs-on: windows-latest
-    needs: release_unix
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -46,17 +49,40 @@ jobs:
         with:
           go-version: stable
 
-      - name: Build Windows
-        uses: goreleaser/goreleaser-action@v7
+      - name: Build Windows artifacts
+        uses: goreleaser/goreleaser-action@v5
         with:
           version: latest
-          args: build --rm-dist --config .goreleaser.yaml
-        env:
-          CGO_ENABLED: 1
+          args: build --rm-dist --config .goreleaser.yaml-windows
 
-      - name: Upload Windows artifacts to release
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifact
+          path: dist/windows/*
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build_unix, build_windows]
+
+    steps:
+      - name: Download Unix artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: unix-artifact
+          path: dist/unix
+
+      - name: Download Windows artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: windows-artifact
+          path: dist/windows
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: |
+            dist/unix/**
+            dist/windows/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
