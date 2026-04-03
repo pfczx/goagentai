@@ -73,9 +73,8 @@ github.com/pfczx/goagentai
 | **Go 1.25+** | Required by `go.mod`. |
 | **Git** | To clone the repository. |
 | **Terminal with ANSI colour support** | For nicer REPL prompting (charmbracelet packages rely on it). |
-|** XGB for linux/BSD or cgo for OSX**| screenshot package dependancies github.com/kbinani/screenshot |
+|**X11 for linux/BSD(works on wyland but may throw XBG errors) or cgo for OSX and Windows**| screenshot package dependancies github.com/kbinani/screenshot |
 
-XGB or cgo will be installed automatically, but your system should support their requirements
 
 ---
 
