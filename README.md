@@ -334,7 +334,5 @@ You will see a prompt of the form:
 GoAgent@default (groq::groq::openai/gpt-oss-20b) 36036 / 1000000 (3.60%)
 ```
 
-Execute any of the commands above. The REPL supports line editing, history, and automatic colourisation.
 
----
 
