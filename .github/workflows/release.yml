@@ -55,8 +55,6 @@ jobs:
         with:
           version: latest
           args: build --rm-dist --config .goreleaser.yaml-windows
-      - name: DEBUG FILES
-        run: dir /s
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
