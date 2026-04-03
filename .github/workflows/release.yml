@@ -30,22 +30,37 @@ jobs:
           args: build --rm-dist --config .goreleaser.yaml-unix
       - name: Package Unix
         run: |
-          mkdir -p dist/release
+          mkdir -p dist/release/tmp
 
-          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_amd64.tar.gz \
-            -C dist/unix/goagentai_linux_amd64_v1 goagentai
+          # Linux amd64
+          cp dist/unix/goagentai_linux_amd64_v1/goagentai dist/release/tmp/
+          cp LICENSE README.md dist/release/tmp/
+          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_amd64.tar.gz -C dist/release/tmp .
+          rm -rf dist/release/tmp/*
 
-          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_arm64.tar.gz \
-            -C dist/unix/goagentai_linux_arm64 goagentai
+          # Linux arm64
+          cp dist/unix/goagentai_linux_arm64/goagentai dist/release/tmp/
+          cp LICENSE README.md dist/release/tmp/
+          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_arm64.tar.gz -C dist/release/tmp .
+          rm -rf dist/release/tmp/*
 
-          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_386.tar.gz \
-            -C dist/unix/goagentai_linux_386 goagentai
+          # Linux 386
+          cp dist/unix/goagentai_linux_386/goagentai dist/release/tmp/
+          cp LICENSE README.md dist/release/tmp/
+          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_linux_386.tar.gz -C dist/release/tmp .
+          rm -rf dist/release/tmp/*
 
-          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_darwin_amd64.tar.gz \
-            -C dist/unix/goagentai_darwin_amd64_v1 goagentai
+          # macOS amd64
+          cp dist/unix/goagentai_darwin_amd64_v1/goagentai dist/release/tmp/
+          cp LICENSE README.md dist/release/tmp/
+          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_darwin_amd64.tar.gz -C dist/release/tmp .
+          rm -rf dist/release/tmp/*
 
-          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_darwin_arm64.tar.gz \
-            -C dist/unix/goagentai_darwin_arm64 goagentai
+          # macOS arm64
+          cp dist/unix/goagentai_darwin_arm64/goagentai dist/release/tmp/
+          cp LICENSE README.md dist/release/tmp/
+          tar -czf dist/release/goagentai_${GITHUB_REF_NAME}_darwin_arm64.tar.gz -C dist/release/tmp .
+          rm -rf dist/release/tmp/*
 
       - name: Upload Unix artifact
         uses: actions/upload-artifact@v4
@@ -76,11 +91,17 @@ jobs:
       - name: Package Windows
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path dist\release
+          New-Item -ItemType Directory -Force -Path dist\release\tmp
+
+          Copy-Item dist\windows\goagentai_windows_amd64_v1\goagentai.exe dist\release\tmp\
+          Copy-Item LICENSE dist\release\tmp\
+          Copy-Item README.md dist\release\tmp\
 
           Compress-Archive `
-            -Path dist\windows\goagentai_windows_amd64_v1\goagentai.exe `
-            -DestinationPath dist\release\goagentai_${env:GITHUB_REF_NAME}_windows_amd64.zip
+          -Path dist\release\tmp\* `
+          -DestinationPath dist\release\goagentai_${env:GITHUB_REF_NAME}_windows_amd64.zip
+
+          Remove-Item dist\release\tmp\* -Recurse -Force
 
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
