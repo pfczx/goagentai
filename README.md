@@ -317,7 +317,7 @@ The usage information is displayed after each answer and added to the persisted 
 goagentai switch profile myprofile
 
 # Ask a question, ask for markdown output
-goagentai ask "Explain quantum entanglement in three sentences" -p
+goagentai ask "Explain quantum entanglement in three sentences" 
 ```
 
 If `-s` is supplied, the CLI will pause and wait for you to specify a display number to capture a screenshot. The image is then Base64 encoded and sent as part of the prompt.
