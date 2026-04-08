@@ -8,7 +8,11 @@ The project is written in Go and bundles a lightweight file‑based SQLite datab
 
 
 
-https://github.com/user-attachments/assets/a7c62014-117e-4306-af8d-83bab46be987
+
+https://github.com/user-attachments/assets/0932bce9-ccbc-4ea5-b5e5-9a24b11f8a8d
+
+
+
 
 
 ---
@@ -16,14 +20,21 @@ https://github.com/user-attachments/assets/a7c62014-117e-4306-af8d-83bab46be987
 ## Example of use (workspace)
 
 
-https://github.com/user-attachments/assets/5c7a0ff7-e19e-4f6f-a738-fe7d08e3830d
+
+https://github.com/user-attachments/assets/3203fe97-0a1d-44f9-99ba-027bbb9f2efd
+
+
 
 ---
 
 ## Example of use (screenshot)
 
 
-https://github.com/user-attachments/assets/fe2a04de-3b05-45dd-829d-457cb960cf2a
+https://github.com/user-attachments/assets/bf116d78-5372-4390-8ce5-9a700ef4a392
+
+
+
+
 
 ---
 
