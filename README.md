@@ -220,7 +220,7 @@ goagentai ask <prompt>
 
 Output is rendered:
 
-* With Markdown if `profile.config.MdFormat` is `true` (requires `github.com/charmbracelet/glamour`).  
+* With Markdown if `profile.config.MdFormat` is `true`.  
 * Otherwise plain text is printed.
 
 The command returns token usage statistics when available.
@@ -236,9 +236,14 @@ Switches various runtime settings:
 | `profile` | `goagentai switch profile <new_name>` |
 | `provider` | `goagentai switch provider <provider_name>` |
 | `internal-provider` | `goagentai switch internal-provider <number or name>` |
-| `model` | `goagentai switch model <number or model_name>` |
+| `model` | `goagentai switch model <number or model_name> < -img flag(if digit is used to select model with image input)>` |
 
 Numbers refer to the order shown by `list`/`list providers`.
+
+#### Optional Flags
+| Flag | Effect |
+|------|--------|
+| `-img` | Use this flag when switching model with digit to use proper models list. |
 
 ---
 
