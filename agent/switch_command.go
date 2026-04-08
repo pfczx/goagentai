@@ -23,6 +23,7 @@ func Switch(agent *Agent, args ...string) error {
 			return err
 		}
 		*agent = *newAgent
+		agent.Profile.SaveLatestUsedProfileName()
 		return nil
 
 	case "provider", "pv":
@@ -53,10 +54,22 @@ func Switch(agent *Agent, args ...string) error {
 
 	case "model", "m":
 		if isNumber(args[1]) {
-			models, err := agent.Profile.Provider.ListProviderModels(
-				agent.Profile.Provider.IternalProviderName(), false)
-			if err != nil {
-				return fmt.Errorf("error fetching models: %w", err)
+			var models []string
+			var err error
+			if len(args) == 3 && args[2] == "-img" {
+				models, err = agent.Profile.Provider.ListProviderModels(
+					agent.Profile.Provider.IternalProviderName(), true)
+				if err != nil {
+					return fmt.Errorf("error fetching models: %w", err)
+				}
+
+			} else {
+				models, err = agent.Profile.Provider.ListProviderModels(
+					agent.Profile.Provider.IternalProviderName(), false)
+				if err != nil {
+					return fmt.Errorf("error fetching models: %w", err)
+				}
+
 			}
 
 			num, _ := strconv.Atoi(args[1])

@@ -69,7 +69,7 @@ func GetCommands() map[string]CliCommand {
 		"switch": {
 			Name:     "switch",
 			Alias:    "s",
-			Desc:     "Switching setting provided in first argument, instead of a name you can provide numbers from command list without flags \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  profile : p  internal-provider : ip  provider : pv  model : m",
+			Desc:     "Switching setting provided in first argument, instead of a name you can provide numbers from command list without flags \n\nswitch [thing to swith or alias] [name of new thing ] \n\nfirst arguments ->  profile : p  internal-provider : ip  provider : pv  model : m (add -img flag when using digits and selecting model with image support)",
 			Callback: agent.Switch,
 		},
 		"list": {
