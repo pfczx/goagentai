@@ -4,6 +4,28 @@
 The project is written in Go and bundles a lightweight file‑based SQLite database, a modular configuration system, and out‑of‑the‑box support for several LLM providers (Groq, HuggingFace, OpenRouter).
 
 ---
+##Example of use
+
+
+
+https://github.com/user-attachments/assets/a7c62014-117e-4306-af8d-83bab46be987
+
+
+---
+
+##Example of use (workspace)
+
+
+https://github.com/user-attachments/assets/5c7a0ff7-e19e-4f6f-a738-fe7d08e3830d
+
+---
+
+##Example of use (screenshot)
+
+
+https://github.com/user-attachments/assets/fe2a04de-3b05-45dd-829d-457cb960cf2a
+
+---
 
 ## Table of Contents
 1. [Architecture Overview](#architecture-overview)  
